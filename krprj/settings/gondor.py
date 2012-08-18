@@ -22,8 +22,8 @@ if "GONDOR_DATABASE_URL" in os.environ:
 if 'SECRET_KEY' in os.environ:
    SECRET_KEY = os.environ['SECRET_KEY']
 
-MEDIA_ROOT = os.path.join(os.environ["GONDOR_DATA_DIR"], "media")
-STATIC_ROOT = os.path.join(os.environ["GONDOR_DATA_DIR"], "static")
+MEDIA_ROOT = os.path.join(os.environ["GONDOR_DATA_DIR"], "site_media", "media")
+STATIC_ROOT = os.path.join(os.environ["GONDOR_DATA_DIR"], "site_media", "static")
 
-MEDIA_URL = '/media/'
-STATIC_ROOT = '/static/'
+MEDIA_URL = '/site_media/media/'
+STATIC_ROOT = '/site_media/static/'
