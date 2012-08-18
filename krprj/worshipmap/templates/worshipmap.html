@@ -17,9 +17,10 @@ img {
 
 {% block run_js %}
 <script type="text/javascript">
+    kr = {}
     $(document).ready(function(){
         var osm_layer = new OpenLayers.Layer.OSM("OSM Map Layer");
-        var map = new OpenLayers.Map({
+        kr.map = new OpenLayers.Map({
             div: 'map',
             layers: [osm_layer],
             center: [0, 0],
@@ -31,11 +32,19 @@ img {
             bind: true,
         });
         geolocate.events.register("locationupdated", geolocate, function(e) {
-            map.zoomTo(13);
+            kr.map.zoomTo(13);
         });
 
-        map.addControl(geolocate);
+        kr.map.addControl(geolocate);
         geolocate.activate();
+
+        kr.map.events.register("moveend", map, function(e){
+            console.log(e.object.getExtent())
+            console.log(e.object.getExtent().toBBOX())
+            $.getJSON("/worshipmap/_get_places?in_bbox=" + e.object.getExtent().toBBOX(), function(response){
+                console.log(response.countries)
+            })
+        });
 
     });
 </script>
