@@ -3,10 +3,7 @@ from django.contrib import auth
 
 class ApiKeyMiddleware(object):
     def process_request(self, request):
-        if 'HTTP_APIKEY' not in request.META:
-            return None
-
-        auth_string = request.META['HTTP_APIKEY']
+        auth_string = request.META.get('HTTP_APIKEY')
 
         if not auth_string:
             return None
