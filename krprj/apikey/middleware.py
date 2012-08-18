@@ -14,5 +14,6 @@ class ApiKeyMiddleware(object):
             return None
 
         if key.user:
+            key.login(request.META.get('REMOTE_ADDR'))
             request.user = key.user
         return
