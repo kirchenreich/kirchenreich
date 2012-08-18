@@ -23,5 +23,5 @@ pip-log.txt
 #Translations
 *.mo
 
-#Mr Developer
-.mr.developer.cfg
+# env
+env_kr
