@@ -5,8 +5,13 @@ from infobox import parse_infobox
 from socket import gethostname
 
 def infobox_test(page, cats):
-    ibox = parse_infobox(page)
-    print ibox
+#    ibox = parse_infobox(page)
+#    for item in ibox:
+#        print "Key:", item, "Value:", ibox[item]
+#    print ibox
+    coords = wikiextractor.find_coords(page)
+    if coords:
+        print coords
 
 hostname = gethostname()
 
