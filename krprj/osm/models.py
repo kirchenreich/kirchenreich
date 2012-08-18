@@ -15,6 +15,8 @@ class KircheOsm(models.Model):
     lon = models.FloatField(blank=True, null=True)
     lat = models.FloatField(blank=True, null=True)
 
+    point = models.PointField(blank=True, null=True)
+
     mpoly = models.MultiPolygonField(blank=True, null=True)
 
     objects = models.GeoManager()
