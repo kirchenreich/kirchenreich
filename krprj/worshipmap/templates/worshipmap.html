@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block load_css %}
+{{ block.super }}
+<style>
+img {
+    max-width: none; /* Fix twitter bootstrap to work together with OpenLayers */
+}
+</style>
+{% endblock %}
+
+{% block load_js %}
+{{ block.super }}
+<script type="text/javascript" src="{{ STATIC_URL }}openlayers/OpenLayers.js"></script>
+{% endblock %}
+
+
+{% block run_js %}
+<script type="text/javascript">
+    kr = {}
+    $(document).ready(function(){
+        var osm_layer = new OpenLayers.Layer.OSM("OSM Map Layer");
+        kr.map = new OpenLayers.Map({
+            div: 'map',
+            layers: [osm_layer],
+            center: [0, 0],
+            zoom: 1,
+        });
+
+        // Geolocation
+        var geolocate = new OpenLayers.Control.Geolocate({
+            bind: true,
+        });
+        geolocate.events.register("locationupdated", geolocate, function(e) {
+            kr.map.zoomTo(13);
+        });
+
+        kr.map.addControl(geolocate);
+        geolocate.activate();
+
+        kr.map.events.register("moveend", map, function(e){
+            console.log(e.object.getExtent())
+            console.log(e.object.getExtent().toBBOX())
+            $.getJSON("/worshipmap/_get_places?in_bbox=" + e.object.getExtent().toBBOX(), function(response){
+                console.log(response.countries)
+            })
+        });
+
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div id="map"></div>
+{% endblock %}
