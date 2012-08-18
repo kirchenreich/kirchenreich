@@ -6,7 +6,7 @@ This is a Django Dash 2012 project.
 Install How-to
 --------------
 
- * clone github repo
+* clone github repo
 
 ::
 
@@ -27,8 +27,8 @@ Install How-to
 Run locally
 -----------
 
-  * you need postgresql with postgis support!
-  * download world to world/data/::
+* you need postgresql with postgis support!
+* download world to world/data/::
 
   mkdir world/data
   cd world/data
@@ -36,10 +36,9 @@ Run locally
   unzip TM_WORLD_BORDERS-0.3.zip
   rm TM_WORLD_BORDERS-0.3.zip
 
-  * import worlddata (in django shell)::
+* import worlddata (in django shell)::
 
   from world import load
   load.run()
 
-  * ./manage.py runserver
-
+* ./manage.py runserver
