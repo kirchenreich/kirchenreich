@@ -123,6 +123,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
 
     'krprj.world',
+    'south',
 )
 
 # A sample logging configuration. The only tangible logging
