@@ -1,7 +1,7 @@
 import os
 import urlparse
 
-from .settings import *
+from .default import *
 
 if "GONDOR_DATABASE_URL" in os.environ:
     urlparse.uses_netloc.append("postgres")
