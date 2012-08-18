@@ -28,8 +28,9 @@ Run locally
 -----------
 
 * you need postgresql with postgis support!
-* download world to world/data/::
+* download world to world/data/:
 
+::
   mkdir world/data
   cd world/data
   wget http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
