@@ -2,6 +2,7 @@
 from models import KircheOsm
 import codecs
 import json
+from django.contrib.gis.geos import MultiPolygon, Polygon
 
 def load_nodes(filename):
     """ imports the churches which are only consisting of one point.
@@ -26,6 +27,12 @@ def load_nodes(filename):
             del dtags['denomination']
         del dtags['amenity']
         new_kosm.addional_fields = dtags
+
+        # generate multipolygon out of node point to get map on admin!
+        new_kosm.mpoly = MultiPolygon(Polygon(((new_kosm.lon, new_kosm.lat),
+                                               (new_kosm.lon, new_kosm.lat),
+                                               (new_kosm.lon, new_kosm.lat),
+                                               (new_kosm.lon, new_kosm.lat))))
         new_kosm.save()
 
 
