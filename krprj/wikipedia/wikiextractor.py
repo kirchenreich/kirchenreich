@@ -5,6 +5,7 @@ import codecs
 import re
 from Queue import Queue
 from threading import Thread
+from infobox import parse_infobox
 
 class WikiExtractor:
 
@@ -39,6 +40,27 @@ class WikiExtractor:
 
 THREADS=4
 q = Queue(THREADS*2)
+
+def find_coords(page):
+    lat = False
+    lon = False
+    ibox = parse_infobox(page)
+    if 'latitude' in ibox:
+        lat = ibox['latitude']
+    elif 'Latitude' in ibox:
+        lat = ibox['Latitude']
+    if lat:
+        if 'longitude' in ibox:
+            lon = ibox['longitude']
+        elif 'Longitude' in ibox:
+            lon = ibox['Longitude']
+    if lat and lon:
+        return (lat, lon)
+    
+    text = ''.join(page)
+    match = re.search(r'\{\{coord\|(\d+)\|(\d+)\|(\d+)\|N\|(\d+)\|(\d+)\|(\d+)\|E', text, re.IGNORECASE)
+    if match:
+        return (match.groups()[0:3], match.groups()[3:6])
 
 
 def spawn(callback, count=THREADS):
