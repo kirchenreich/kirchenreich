@@ -121,7 +121,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.gis',
-     'world',
+
+    'krprj.world',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -153,7 +154,3 @@ LOGGING = {
     }
 }
 
-try:
-    from local_settings import *
-except ImportError:
-    pass
