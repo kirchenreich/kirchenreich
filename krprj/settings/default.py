@@ -124,6 +124,7 @@ INSTALLED_APPS = (
 
     'krprj.world',
     'krprj.osm',
+    'south',
 )
 
 # A sample logging configuration. The only tangible logging
