@@ -121,6 +121,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.gis',
+     'world',
 )
 
 # A sample logging configuration. The only tangible logging
