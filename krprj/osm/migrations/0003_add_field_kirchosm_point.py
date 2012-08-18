@@ -10,7 +10,7 @@ class Migration(DataMigration):
     def forwards(self, orm):
         "Write your forwards methods here."
         for node in orm['osm.KircheOsm'].objects.all():
-            node.point = Point(node.lat, node.lon)
+            node.point = Point(node.lon, node.lat)
             node.save()
 
     def backwards(self, orm):
