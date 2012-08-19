@@ -1,3 +1,4 @@
+import json
 from copy import copy
 
 from django.views.generic.base import TemplateView
@@ -29,5 +30,9 @@ class PlaceOfWorshipDetailView(DetailView):
         point = copy(self.object.point)
         point.transform(900913)
         context['point_for_openlayers'] = point
+
+        context['addional_fields'] = json.loads(
+            self.object.addional_fields
+        )
 
         return context

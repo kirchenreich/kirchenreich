@@ -53,6 +53,33 @@ img {
                     </tr>
                 </tbody>
             </table>
+            <div class="tabbable">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#osm" data-toggle="tab">OpenStreetMap</a></li>
+                    <li><a href="#wikipedia" data-toggle="tab">Wikipedia</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="osm">
+                        {% if addional_fields|length > 0 %}
+                        <table class="table table-bordered">
+                            <tbody>
+                                {% for key, value in addional_fields.items %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="alert alert-info">There are no addional information from OpenStreetMap</div>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane" id="wikipedia">
+                        <p>Wikipedia content....</p>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="span6" style="height: 80%"><div id="map"></div></div>
     </div>
