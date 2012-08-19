@@ -13,6 +13,13 @@ class WorshipMapView(TemplateView):
 
     template_name = "worshipmap.html"
 
+    def get_context_data(self, **kwargs):
+        context = super(WorshipMapView, self).get_context_data(**kwargs)
+
+        context['osm_places_count'] = KircheOsm.objects.count()
+        context['wikipedia_places_count'] = "???"
+        return context
+
 
 class PlaceOfWorshipDetailView(DetailView):
     """The detail view about a place of worship"""
