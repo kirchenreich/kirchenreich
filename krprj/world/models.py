@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 
+
 class WorldBorder(models.Model):
     # Regular Django fields corresponding to the attributes in the
     # world borders shapefile.
