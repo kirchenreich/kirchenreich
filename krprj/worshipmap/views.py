@@ -5,6 +5,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 
 from krprj.osm.models import KircheOsm
+from krprj.wikipedia.models import KircheWikipedia
 
 
 class WorshipMapView(TemplateView):
@@ -17,7 +18,7 @@ class WorshipMapView(TemplateView):
         context = super(WorshipMapView, self).get_context_data(**kwargs)
 
         context['osm_places_count'] = KircheOsm.objects.count()
-        context['wikipedia_places_count'] = "???"
+        context['wikipedia_places_count'] = KircheWikipedia.objects.count()
         return context
 
 
