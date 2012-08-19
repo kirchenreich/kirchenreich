@@ -22,7 +22,7 @@ class ValueStore(models.Model):
         return "%s" % (self.key)
     
 class KircheWikipedia(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, db_index=True)
 
     infobox = models.TextField(blank=True, null=True, default=None)
     contents = models.TextField(blank=True, null=True, default=None)
