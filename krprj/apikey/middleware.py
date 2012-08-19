@@ -1,6 +1,7 @@
 from models import ApiKey
 from django.contrib import auth
 
+
 class ApiKeyMiddleware(object):
     def process_request(self, request):
         if 'HTTP_APIKEY' not in request.META:
