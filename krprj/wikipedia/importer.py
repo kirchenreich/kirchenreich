@@ -5,6 +5,7 @@ from infobox import parse_infobox
 from socket import gethostname
 import models
 import json
+import sys
 
 def inserter(page, cats):
     ibox = parse_infobox(page)
@@ -12,14 +13,16 @@ def inserter(page, cats):
     if coords:
         title = wikiextractor.get_title(page)
 
-        new_kwiki, created = models.KircheWikipedia.objects.get_or_create(title=title,
+        try:
+            new_kwiki, created = models.KircheWikipedia.objects.get_or_create(title=title,
                                                                           infobox=json.dumps(ibox),
                                                                           contents=''.join(page),
                                                                           lon=coords[0],
                                                                           lat=coords[1])
-        if created:
-            print "created", title
-
+            if created:
+                #print "created", title
+        except:
+            sys.stderr.write('!!!!ERROR inserting %s'%title)
 def insert():
     hostname = gethostname()
 
