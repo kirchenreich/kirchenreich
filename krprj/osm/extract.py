@@ -11,6 +11,7 @@ All correlating coordinates to the ways are saved in coords.data in the
 second run.
 """
 
+
 class GetChurches(object):
     """ collect all nodes and ways with amenity="place_of_worship"
     """
@@ -47,6 +48,7 @@ class GetChurches(object):
                 self.fways.write("%s\n" % json.dumps(d))
                 for ref in refs:
                     self.frefs.write("%d\n" % ref)
+
 
 class GetRefs(object):
     """ Get all nodes for ways from first run.
@@ -91,6 +93,26 @@ class GetRefs(object):
             if osmid >= self.osmid:
                 self.osmid = self.nextref()
 
+
+class GetAllRefs(object):
+    """ Get all nodes for ways from first run.
+    """
+
+    def __init__(self, opts, fn=None):
+        self.fcoords = open(os.path.join(opts.datadir, "coords_all.data"), "w")
+
+    def __del__(self):
+        self.fcoords.close()
+
+    def coords(self, coords):
+        """ save all coords
+        every line is one node as a dict (in json)
+        """
+        for osmid, lon, lat in coords:
+            d = {'id': osmid, 'lon':lon, 'lat':lat}
+            self.fcoords.write("%s\n" % json.dumps(d))
+
+
 def options():
     parser = argparse.ArgumentParser(
         description='Extracting data from openstreetmap.')
@@ -105,6 +127,9 @@ def options():
                         action='store_false',
                         help='run second step (extract all reference ' +\
                         'coords in ways)')
+    parser.add_argument('--alt', dest='alt', default=False,
+                        action='store_true',
+                        help='run alternative extraction of coords')
     parser.add_argument('--datadir', dest='datadir', default='data',
                         help='folder for saving extracted data.')
     parser.add_argument('-v', '--verbose', dest='verbose', default=False,
@@ -130,4 +155,11 @@ if __name__=='__main__':
         second = GetRefs(opts)
         p = OSMParser(concurrency=4,
                       coords_callback=second.coords)
+        p.parse(opts.filename)
+    if opts.alt:
+        if opts.verbose:
+            print("alternative run")
+        alt = GetAllRefs(opts)
+        p = OSMParser(concurrency=4,
+                      coords_callback=alt.coords)
         p.parse(opts.filename)
