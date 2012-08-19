@@ -71,7 +71,7 @@ def load_polygon(filename):
         for ref in data.get('refs'):
             x = coords.get(ref)
             if x:
-                tpl.append(tuple([x.get('lon'), 
+                tpl.append(tuple([x.get('lon'),
                                   x.get('lat')]))
             else:
                 print("missing: %d" % ref)
@@ -79,11 +79,21 @@ def load_polygon(filename):
         try:
             kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
             print kosm.mpoly
-        except:
-            print tuple(tpl)
 
-        kosm.point = kosm.mpoly.centroid
-        print kosm.point
+            kosm.point = kosm.mpoly.centroid
+            print kosm.point
+        except:
+            try:
+                # add first point at the end to close the ring.
+                tpl.append(tpl[0])
+                kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
+                print kosm.mpoly
+
+                kosm.point = kosm.mpoly.centroid
+                print kosm.point
+            except:
+                print tuple(tpl)
+
 
         kosm.save()
         print 40*'-'
