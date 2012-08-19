@@ -123,7 +123,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'south',
     'krprj.apikey',
-    'krprj.krunite'
+    'krprj.krunite',
     'krprj.osm',
     'krprj.wikipedia',
     'krprj.world',
