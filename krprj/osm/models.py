@@ -5,6 +5,7 @@ from krprj.krunite.models import KircheUnite
 
 import json
 
+
 class KircheOsm(models.Model):
     osm_id = models.IntegerField(db_index=True)
     name = models.TextField(blank=True, null=True, default=None)

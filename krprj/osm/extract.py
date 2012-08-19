@@ -34,7 +34,7 @@ class GetChurches(object):
         """
         for osmid, tags, refs in nodes:
             if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
-                d = {'id': osmid, 'tags':tags, 'refs':refs}
+                d = {'id': osmid, 'tags': tags, 'refs': refs}
                 self.fnodes.write("%s\n" % json.dumps(d))
 
     def ways(self, ways):
@@ -44,7 +44,7 @@ class GetChurches(object):
         """
         for osmid, tags, refs in ways:
             if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
-                d = {'id': osmid, 'tags':tags, 'refs':refs}
+                d = {'id': osmid, 'tags': tags, 'refs': refs}
                 self.fways.write("%s\n" % json.dumps(d))
                 for ref in refs:
                     self.frefs.write("%d\n" % ref)
@@ -73,12 +73,12 @@ class GetRefs(object):
 
     def sortrefs(self, fn):
         """
-        use the "sort" command of unix to sort. 
+        use the "sort" command of unix to sort.
         for big files the best possible choice!
         """
         import subprocess
         fnsorted = '%s.sorted' % fn
-        
+
         subprocess.check_call('sort -n %s > %s' % (fn, fnsorted), shell=True)
         return fnsorted
 
@@ -88,7 +88,7 @@ class GetRefs(object):
         """
         for osmid, lon, lat in coords:
             if osmid == self.osmid:
-                d = {'id': osmid, 'lon':lon, 'lat':lat}
+                d = {'id': osmid, 'lon': lon, 'lat': lat}
                 self.fcoords.write("%s\n" % json.dumps(d))
             if osmid >= self.osmid:
                 self.osmid = self.nextref()
@@ -125,7 +125,7 @@ class GetRefsRemaining(object):
         """
         for osmid, lon, lat in coords:
             if osmid in self.mrefs:
-                d = {'id': osmid, 'lon':lon, 'lat':lat}
+                d = {'id': osmid, 'lon': lon, 'lat': lat}
                 self.fcoords.write("%s\n" % json.dumps(d))
                 self.mrefs.remove(osmid)
 
@@ -135,7 +135,7 @@ class GetRefsRemaining(object):
         """
         for osmid, tags, refs in ways:
             if osmid in self.mrefs:
-                d = {'id': osmid, 'tags':tags, 'refs':refs}
+                d = {'id': osmid, 'tags': tags, 'refs': refs}
                 self.fcoords.write("%s\n" % json.dumps(d))
                 self.mrefs.remove(osmid)
                 for ref in refs:
@@ -167,7 +167,7 @@ def options():
     args = parser.parse_args()
     return args
 
-if __name__=='__main__':
+if __name__ == '__main__':
 
     opts = options()
     if opts.first:

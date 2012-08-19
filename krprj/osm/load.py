@@ -39,7 +39,9 @@ def load_polygon(filename):
     """ imports the churches which are consisting of polygons.
     """
     # read all coordinates in memory
-    fp = codecs.open('krprj/osm/data/coords_merged.data', encoding='utf-8', mode='r')
+    fp = codecs.open('krprj/osm/data/coords_merged.data',
+                     encoding='utf-8',
+                     mode='r')
     coords = {}
     for line in fp:
         try:
@@ -77,7 +79,7 @@ def load_polygon(filename):
                                   x.get('lat')]))
             else:
                 print("missing reference: %d" % ref)
-                
+
         try:
             kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
             kosm.point = kosm.mpoly.centroid
