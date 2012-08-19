@@ -10,31 +10,28 @@ def load_nodes(filename):
     fp = codecs.open(filename, encoding='utf-8', mode='r')
     for line in fp:
         data = json.loads(line)
-        if KircheOsm.objects.filter(osm_id=data['id']).count():
-            continue
 
-        new_kosm = KircheOsm.objects.create(lon=data['refs'][0],
-                                            lat=data['refs'][1],
-                                            osm_id=data['id'])
+        kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
+
+        kosm.lon = data['refs'][0]
+        kosm.lat = data['refs'][1]
+
         dtags = data.get('tags')
         if 'name' in dtags:
-            new_kosm.name = dtags['name']
+            kosm.name = dtags['name']
             del dtags['name']
         if 'religion' in dtags:
-            new_kosm.religion = dtags['religion']
+            kosm.religion = dtags['religion']
             del dtags['religion']
         if 'denomination' in dtags:
-            new_kosm.denomination = dtags['denomination']
+            kosm.denomination = dtags['denomination']
             del dtags['denomination']
         del dtags['amenity']
-        new_kosm.addional_fields = dtags
+        kosm.addional_fields = json.dumps(dtags)
 
-        # generate multipolygon out of node point to get map on admin!
-        new_kosm.mpoly = MultiPolygon(Polygon(((new_kosm.lon, new_kosm.lat),
-                                               (new_kosm.lon, new_kosm.lat),
-                                               (new_kosm.lon, new_kosm.lat),
-                                               (new_kosm.lon, new_kosm.lat))))
-        new_kosm.save()
+        # set mpoly and point in dataset
+        kosm.set_geo()
+        kosm.save()
 
 
 def load_polygon(filename):
