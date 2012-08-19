@@ -66,13 +66,11 @@ class KircheUniteManager(models.Manager):
         """ correlate osm datasets with wikipedia datasets
         """
         from krprj.osm.models import KircheOsm
-        from krprj.world.models import WorldBorder
-        from krprj.wikipedia.models import KircheWikipedia
-
         for elem in KircheOsm.objects.all():
             self.correlate_osm(elem)
 
     def correlate_osm(self, elem):
+        from krprj.wikipedia.models import KircheWikipedia
         if not elem.unite:
             elem.unite = KircheUnite.objects.create(name=elem.name,
                                                     point=elem.point)
