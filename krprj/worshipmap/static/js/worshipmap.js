@@ -70,10 +70,10 @@ kr.buildMap = function(target_div, center, zoom, use_geolocate){
                     marker.place_id = place.id;
 
                     if (place.name === null) {
-                        place.name = "unknow";
+                        place.name = "unknown";
                     }
                     if (place.religion === null) {
-                        place.religion = "unknow";
+                        place.religion = "unknown";
                     }
                     tooltip = OpenLayers.String.format("${name} (${religion})", place);
 

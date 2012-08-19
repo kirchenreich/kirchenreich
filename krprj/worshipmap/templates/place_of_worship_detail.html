@@ -29,7 +29,7 @@ img {
 {% block content %}
 <div class="container">
     <div class="page-header">
-        <h1>{{ object.name|default_if_none:"<em>unknow</em>"|safe }}</h1>
+        <h1>{{ object.name|default_if_none:"<em>unknown</em>"|safe }}</h1>
     </div>
     <div class="row">
         <div class="span6">
@@ -45,11 +45,11 @@ img {
                     </tr>
                     <tr>
                         <td>Religion</td>
-                        <td>{{ object.religion|default_if_none:"<em>unknow</em>"|safe }}</td>
+                        <td>{{ object.religion|default_if_none:"<em>unknown</em>"|safe }}</td>
                     </tr>
                     <tr>
                         <td>Denomination</td>
-                        <td>{{ object.denomination|default_if_none:"<em>unknow</em>"|safe }}</td>
+                        <td>{{ object.denomination|default_if_none:"<em>unknown</em>"|safe }}</td>
                     </tr>
                 </tbody>
             </table>
