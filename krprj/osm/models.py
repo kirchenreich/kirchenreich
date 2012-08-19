@@ -1,6 +1,8 @@
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point, MultiPolygon, Polygon
 
+from krprj.krunite.models import KircheUnite
+
 
 class KircheOsm(models.Model):
     osm_id = models.IntegerField(db_index=True)
@@ -20,6 +22,8 @@ class KircheOsm(models.Model):
     point = models.PointField(blank=True, null=True)
 
     mpoly = models.MultiPolygonField(blank=True, null=True)
+
+    unite = models.ForeignKey(KircheUnite, blank=True, null=True)
 
     objects = models.GeoManager()
 
