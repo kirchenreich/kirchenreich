@@ -5,8 +5,14 @@ from infobox import parse_infobox
 from socket import gethostname
 
 def infobox_test(page, cats):
-    ibox = parse_infobox(page)
-    print ibox
+#    ibox = parse_infobox(page)
+#    for item in ibox:
+#        print "Key:", item, "Value:", ibox[item]
+#    print ibox
+    coords = wikiextractor.find_coords(page)
+    if coords:
+        title = wikiextractor.get_title(page)
+        print title, coords
 
 hostname = gethostname()
 
@@ -17,5 +23,5 @@ if hostname == 'ziegensittich':
 
 if filename:
     wikiextractor.run(filename,
-                      r"(place.*worship|church|chapel|mosque|temple)",
+                      r"(place.*worship|church|chapel|mosque|temple|shrine|fane)",
                       infobox_test)
