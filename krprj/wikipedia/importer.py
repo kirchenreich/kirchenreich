@@ -9,11 +9,13 @@ import sys
 
 def inserter(page, cats, title, lon, lat, sha1):
     if lon and lat:
-        ibox = parse_infobox(page)
         try:
             new_kwiki, created = models.KircheWikipedia.objects.get_or_create(title=title)
+            if created:
+                ibox = parse_infobox(page)
+                new_kwiki.infobox=json.dumps(ibox)
+                
             new_kwiki.sha1 = sha1
-            new_kwiki.infobox=json.dumps(ibox)
             new_kwiki.contents=''.join(page)
             if not isinstance(lon, bool):
                 new_kwiki.lon=lon
