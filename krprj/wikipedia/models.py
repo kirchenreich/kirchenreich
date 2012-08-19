@@ -37,6 +37,8 @@ class KircheWikipedia(models.Model):
 
     sha1 = models.TextField(blank=True, null=True, default=None)
 
+    point = models.PointField(blank=True, null=True)
+
     categories = models.ManyToManyField(CategoryWikipedia,
                                         related_name='categories+')
 
