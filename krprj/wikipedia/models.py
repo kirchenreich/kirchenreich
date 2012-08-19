@@ -74,3 +74,13 @@ class KircheWikipedia(models.Model):
         if not self.point and lon and lat:
             self.point = Point(lon, lat)
             self.save()
+
+    def jsonify(self):
+        d = {'title': self.title,
+             'infobox': self.infobox,
+             'contents': self.contents,
+             'lon': self.lon,
+             'lat': self.lat,
+             'sha1': self.sha1,
+             'point': self.point.json}
+        return json.dumps(d)
