@@ -1,4 +1,6 @@
 from django.contrib.gis.db import models
+from django.contrib.gis.geos import Point, MultiPolygon, Polygon
+
 
 class KircheOsm(models.Model):
     osm_id = models.IntegerField()
@@ -23,3 +25,28 @@ class KircheOsm(models.Model):
 
     def __unicode__(self):
         return "%s (%s) [%s]" % (self.id, self.name or '', self.religion or '')
+
+
+    def set_geo(self, lon=None, lat=None):
+        """ set point and mpoly if necessary.
+        a lot have been missed on import.
+        """
+        changed = False
+        if not lon:
+            lon = self.lon
+        if not lat:
+            lat = self.lat
+
+        if not self.point:
+            self.point = Point(lon, lat)
+            changed = True
+
+        if not self.mpoly:
+            self.mpoly = MultiPolygon(Polygon(((lon, lat),
+                                               (lon, lat),
+                                               (lon, lat),
+                                               (lon, lat))))
+            changed = True
+
+        if changed:
+            self.save()
