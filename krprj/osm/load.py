@@ -4,6 +4,7 @@ import codecs
 import json
 from django.contrib.gis.geos import MultiPolygon, Polygon
 
+
 def load_nodes(filename):
     """ imports the churches which are only consisting of one point.
     """
@@ -48,6 +49,7 @@ def load_polygon(filename):
             print line
     fp.close()
     print("dict loaded")
+    # read ways from file and iterate them
     fp = codecs.open('krprj/osm/data/ways.data', encoding='utf-8', mode='r')
     for line in fp:
         data = json.loads(line)
@@ -71,15 +73,23 @@ def load_polygon(filename):
         for ref in data.get('refs'):
             x = coords.get(ref)
             if x:
-                tpl.append(tuple([x.get('lon'), 
+                tpl.append(tuple([x.get('lon'),
                                   x.get('lat')]))
             else:
-                print("missing: %d" % ref)
-
-        kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
-        print kosm.mpoly
-
-        kosm.point = kosm.mpoly.centroid
-        print kosm.point
+                print("missing reference: %d" % ref)
+                
+        try:
+            kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
+            kosm.point = kosm.mpoly.centroid
+        except:
+            try:
+                # add first point at the end to close the ring.
+                tpl.append(tpl[0])
+                kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
+                kosm.point = kosm.mpoly.centroid
+            except:
+                # print wrong tuple. should not happen;
+                # maybe let exception raise
+                print tuple(tpl)
 
         kosm.save()
