@@ -27,6 +27,29 @@ img {
             zoom: 1,
         });
 
+        // Base marker layer
+        kr.markers = new OpenLayers.Layer.Markers( "Markers" );
+        kr.map.addLayer(kr.markers);
+
+        kr.marker_icons = {
+            'default': ['{{ STATIC_URL }}icons/pin.png', new OpenLayers.Size(15, 24)],
+            'christian': ['{{ STATIC_URL }}icons/christianity_church.png', new OpenLayers.Size(24, 25)],
+            'islam': ['{{ STATIC_URL }}icons/islam.png', new OpenLayers.Size(25, 24)],
+            'muslim': ['{{ STATIC_URL }}icons/islam.png', new OpenLayers.Size(25, 24)],
+            'hindu': ['{{ STATIC_URL }}icons/hindu.png', new OpenLayers.Size(24, 24)],
+            'budddhist': ['{{ STATIC_URL }}icons/buddhist.png', new OpenLayers.Size(28, 22)],
+        }
+
+        for (name in kr.marker_icons) {
+            var url = kr.marker_icons[name][0]
+            var size = kr.marker_icons[name][1]
+            kr.marker_icons[name] = new OpenLayers.Icon(
+                url,
+                size,
+                new OpenLayers.Pixel(-(size.w/2), -size.h)
+            )
+        }
+
         // Geolocation
         var geolocate = new OpenLayers.Control.Geolocate({
             bind: true,
@@ -39,12 +62,33 @@ img {
         geolocate.activate();
 
         kr.map.events.register("moveend", map, function(e){
-            $.getJSON("/api/v1/places/?in_bbox=" + e.object.getExtent().toBBOX(), function(response, status, xhr){
+            $.getJSON("/api/v1/places/?epsg=900913&in_bbox=" + e.object.getExtent().toBBOX(), function(response, status, xhr){
                 response_date = new Date(xhr.getResponseHeader('Date'))
                 if (response_date > kr.last_places_api_response) {
+                    kr.markers.clearMarkers();
                     for (i in response.places_of_worship) {
                         place = response.places_of_worship[i]
-                        console.log(place.name)
+                        if (place.religion in kr.marker_icons) {
+                            var icon = kr.marker_icons[place.religion].clone()
+                        } else {
+                            var icon = kr.marker_icons['default'].clone()
+                        }
+                        var marker = new OpenLayers.Marker(new OpenLayers.LonLat(place.lon, place.lat), icon)
+
+
+                        if (place.name === null) {
+                            place.name = "unknow"
+                        }
+                        if (place.religion === null) {
+                            place.religion = "unknow"
+                        }
+                        tooltip = OpenLayers.String.format("${name} (${religion})", place)
+
+                        $(marker.events.element).tooltip({
+                            'title': tooltip
+                        })
+
+                        kr.markers.addMarker(marker);
                     }
                     kr.last_places_api_response = new Date(xhr.getResponseHeader('Date'))
                 }

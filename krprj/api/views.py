@@ -55,11 +55,12 @@ class PlacesResource(View):
         )
 
         # Look for countries which are intersects by our visible map
-        places = KircheOsm.objects.filter(mpoly__intersects=visible_map)
+        places = KircheOsm.objects\
+                          .filter(mpoly__intersects=visible_map)[0:500]
 
         # Is the visible map to big we limit the results to 100 places
-        if visible_map.area > 100:
-            places = places[0:100]
+        # if visible_map.area > 100:
+        #     places = places[0:100]
 
         # Create our json objects of places
         places_of_worship = []
@@ -67,7 +68,10 @@ class PlacesResource(View):
 
             # Use the GeoDjango Point type to transform the cordinations in
             # other epsg formats
-            point = place.point
+            if place.point:
+                point = place.point
+            else:
+                point = Point(place.lon, place.lat)
             try:
                 point.transform(request.GET.get('epsg', 4326))
             except Exception:
@@ -78,7 +82,9 @@ class PlacesResource(View):
                 'id': place.id,
                 'name': place.name,
                 'lon': point.x,
-                'lat': point.y
+                'lat': point.y,
+                'religion': place.religion,
+                'denomination': place.denomination,
             }
             places_of_worship.append(_place)
 
