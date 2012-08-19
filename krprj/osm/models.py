@@ -3,9 +3,9 @@ from django.contrib.gis.db import models
 class KircheOsm(models.Model):
     osm_id = models.IntegerField()
     name = models.TextField(blank=True, null=True, default=None)
-    religion = models.CharField(max_length=100,
+    religion = models.CharField(max_length=200,
                                 blank=True, null=True, default=None)
-    denomination = models.CharField(max_length=100,
+    denomination = models.CharField(max_length=200,
                                     blank=True, null=True, default=None)
     # for now; later using hstore or extra table.
     addional_fields = models.TextField(blank=True, null=True,
