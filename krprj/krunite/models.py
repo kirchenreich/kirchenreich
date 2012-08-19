@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 from datetime import datetime
+from django.utils.timezone import utc
 
 from krprj.world.models import WorldBorder
 
@@ -27,7 +28,7 @@ class KircheChecks(models.Model):
         return "%d [%s]" % (self.id, self.name or '')
 
     def save(self, *args, **kwargs):
-        self.last_update = datetime.utcnow()
+        self.last_update = datetime.utcnow().replace(tzinfo=utc)
         super(KircheChecks, self).save(*args, **kwargs)
 
     def sum_checks(self):
