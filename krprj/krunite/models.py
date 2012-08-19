@@ -91,9 +91,10 @@ class KircheUniteManager(models.Manager):
                                                     point=elem.point)
         elem.unite.country = self.get_country(elem.point)
         elem.unite.save()
-        if not elem.unite.checks:
-            elem.unite.checks = KircheChecks.objects.create(osm=True)
-        elem.unite.checks.run()
+
+#        elem.unite.checks = KircheChecks.objects.get_or_create(
+#            kircheunite=elem.unite.id)
+#        elem.unite.checks.run()
 
         for pnt in self.get_wikipedia(elem.point, KircheWikipedia):
             elem.unite.kirchewikipedia_set.add(pnt)
