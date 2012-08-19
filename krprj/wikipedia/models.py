@@ -1,4 +1,6 @@
 from django.contrib.gis.db import models
+from krprj.krunite.models import KircheUnite
+
 
 class CategoryWikipedia(models.Model):
     name = models.CharField(max_length=50)
@@ -7,6 +9,7 @@ class CategoryWikipedia(models.Model):
     def __unicode__(self):
         return "%s [%s]" % (self.name, self.language)
 
+
 class LanguageWikipedia(models.Model):
     title =  models.CharField(max_length=200)
     language = models.CharField(max_length=10)
@@ -14,12 +17,14 @@ class LanguageWikipedia(models.Model):
     def __unicode__(self):
         return "%s [%s]" % (self.title, self.language)
 
+
 class ValueStore(models.Model):
     key =  models.CharField(max_length=50, db_index=True)
     value = models.TextField(default='')
 
     def __unicode__(self):
         return "%s" % (self.key)
+
     
 class KircheWikipedia(models.Model):
     title = models.CharField(max_length=200, db_index=True)
@@ -40,6 +45,8 @@ class KircheWikipedia(models.Model):
 
     values = models.ManyToManyField(ValueStore,
                                     related_name='values+')
+
+#    unite = models.ForeignKey(KircheUnite, blank=True, null=True)
 
     objects = models.GeoManager()
 
