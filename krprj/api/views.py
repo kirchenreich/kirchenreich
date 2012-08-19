@@ -54,13 +54,15 @@ class PlacesResource(View):
             (p1.x, p1.y, p2.x, p2.y)
         )
 
-        # Look for countries which are intersects by our visible map
-        places = KircheOsm.objects\
-                          .filter(mpoly__intersects=visible_map)[0:500]
+        # Is the visible map to big we don't response places
+        if visible_map.area > 10:
+            return JSONResponse(message="search area to big", _code=422)
 
-        # Is the visible map to big we limit the results to 100 places
-        # if visible_map.area > 100:
-        #     places = places[0:100]
+        # Look for countries which are intersects by our visible map limited
+        # by GET parameter or max value
+        limit = request.GET.get('limit', 500)
+        places = KircheOsm.objects\
+                          .filter(mpoly__intersects=visible_map)[0:limit]
 
         # Create our json objects of places
         places_of_worship = []

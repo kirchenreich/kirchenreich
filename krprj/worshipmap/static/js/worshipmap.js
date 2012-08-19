@@ -51,7 +51,8 @@ kr.buildMap = function(target_div, center, zoom, use_geolocate){
 
     kr.refresh_markers = function(){
         kr.request_id++;
-        $.getJSON("/api/v1/places/?epsg=900913&in_bbox=" + kr.map.getExtent().toBBOX() + "&request_id=" + kr.request_id, function(response, status, xhr){
+        xhr = $.getJSON("/api/v1/places/?epsg=900913&in_bbox=" + kr.map.getExtent().toBBOX() + "&request_id=" + kr.request_id, function(response, status, xhr){
+            $("#zoom_in_alert").hide();
             if (response.request_id == kr.request_id) {
                 kr.markers.clearMarkers();
                 for (var i in response.places_of_worship) {
@@ -83,6 +84,11 @@ kr.buildMap = function(target_div, center, zoom, use_geolocate){
 
                     kr.markers.addMarker(marker);
                 }
+            }
+        }).error(function(){
+            if (xhr.status == 422) {
+                kr.markers.clearMarkers();
+                $("#zoom_in_alert").show();
             }
         });
     };
