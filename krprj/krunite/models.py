@@ -94,6 +94,7 @@ class KircheUniteManager(models.Manager):
         elem.unite.country = self.get_country(elem.point)
         elem.unite.save()
 
+        # commented for later use.
 #        elem.unite.checks = KircheChecks.objects.get_or_create(
 #            kircheunite=elem.unite.id)
 #        elem.unite.checks.run()
@@ -107,7 +108,12 @@ class KircheUniteManager(models.Manager):
 
 
 class KircheUnite(models.Model):
-    # only for convenience
+    """ Table for joining osm and wikipedia datasets.
+    ForeignKeys are from KircheOsm (kircheosm) and
+                         KircheWikipedia (kirchewikipedia)
+    """
+
+    # name field is only for convenience
     name = models.TextField(blank=True, null=True, default=None)
     point = models.PointField(blank=True, null=True)
 
