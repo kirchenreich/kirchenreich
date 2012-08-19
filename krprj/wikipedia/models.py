@@ -30,6 +30,8 @@ class KircheWikipedia(models.Model):
     lon = models.FloatField(blank=True, null=True)
     lat = models.FloatField(blank=True, null=True)
 
+    sha1 = models.TextField(blank=True, null=True, default=None)
+
     categories = models.ManyToManyField(CategoryWikipedia,
                                         related_name='categories+')
 

@@ -15,6 +15,7 @@ class WikiExtractor:
 
     def generator(self):
         titlere = re.compile(r'<title>([^<]*)</title>', re.IGNORECASE)
+        sha1re = re.compile(r'<sha1>([^<]*)</sha1>', re.IGNORECASE)
         latre = re.compile(r'\|\w*latitude\w*=\w*(\d+(?:\.\d*)?)', re.IGNORECASE)
         lonre = re.compile(r'\|\w*longitude\w*=\w*(\d+(?:\.\d*)?)', re.IGNORECASE)
         coordre = re.compile(r'\{\{coord\|(\d+)\|(\d+)\|(\d+)\|N\|(\d+)\|(\d+)\|(\d+)\|E', re.IGNORECASE)
@@ -25,6 +26,7 @@ class WikiExtractor:
         lon = False
         lat = False
         first = True
+        sha1 = False
         relevant = False
         for line in self.fp:
             if line.strip() == '<page>':
@@ -42,7 +44,11 @@ class WikiExtractor:
                 match = titlere.search(line)
                 if match:
                     title = match.groups()[0]
-            if not lat and lon:
+            if not sha1:
+                match = sha1re.search(line)
+                if match:
+                    sha1 = match.groups()[0]
+            if not (lat and lon):
                 match = coordre.search(line)
                 if match:
                     lon1 = match.groups()[0:3]
@@ -66,6 +72,7 @@ class WikiExtractor:
                 title = False
                 lon = False
                 lat = False
+                sha1 = False
                 relevant = False
 
 THREADS=4
@@ -108,8 +115,8 @@ def find_coords(page, ibox=False):
 def spawn(callback, count=THREADS):
     def worker():
         while True:
-            (page, cats, title, lon, lat) = q.get()
-            callback(page, cats, title, lon, lat)
+            (page, cats, title, lon, lat, sha1) = q.get()
+            callback(page, cats, title, lon, lat, sha1)
             q.task_done()
 
     for i in xrange(count):

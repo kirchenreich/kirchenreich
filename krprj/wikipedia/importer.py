@@ -7,7 +7,7 @@ import models
 import json
 import sys
 
-def inserter(page, cats, title, lon, lat):
+def inserter(page, cats, title, lon, lat, sha1):
     if lon and lat:
         ibox = parse_infobox(page)
         try:
@@ -16,6 +16,8 @@ def inserter(page, cats, title, lon, lat):
                                                                           contents=''.join(page),
                                                                           lon=lon,
                                                                           lat=lat)
+            new_kwiki.sha1 = sha1
+            new_kwiki.save()
             # if created:
             #     print "created", title
             sys.stdout.write('.')
