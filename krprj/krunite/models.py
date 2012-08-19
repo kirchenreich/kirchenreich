@@ -38,7 +38,26 @@ class KircheChecks(models.Model):
         return sum([field for field in KircheChecks._meta.fields])
 
     def run(self):
-        pass
+        if self.kircheunite:
+            for osm in self.kircheunite.kircheosm_set.all():
+                self.osm = True
+                if osm.name:
+                    self.osm_name = True
+                if osm.religion:
+                    self.osm_religion = True
+                if osm.denomination:
+                    self.osm_denomination = True
+                d = json.loads(osm.addional_fields)
+                if ('addr:housenumer' in d and
+                    'addr:city' in d and
+                    'addr:postcode' in d and
+                    'addr:street' in d):
+                    self.osm_address_complete = True
+
+            for wiki in self.kircheunite.kirchewikipedia_set.all():
+                self.wikipedia = True
+                if len(wiki.infobox) > 3:
+                    self.wikipedia_infobox = True
 
 
 class KircheUniteManager(models.Manager):
