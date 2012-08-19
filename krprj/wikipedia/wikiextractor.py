@@ -66,7 +66,7 @@ class WikiExtractor:
             if line.strip() == '</page>':
                 if not first:
                     if relevant:
-                        yield (data, cats, title, lon, lat)
+                        yield (data, cats, title, lon, lat, sha1)
                 data = []
                 cats = []
                 title = False
