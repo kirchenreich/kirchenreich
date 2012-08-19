@@ -20,7 +20,7 @@ img {
 <script type="text/javascript">
     $(document).ready(function(){
         var center = [{{ point_for_openlayers.x }}, {{ point_for_openlayers.y }}];
-        kr.buildMap('map', center, 13, false);
+        kr.buildMap('map', center, 15, false);
         kr.refresh_markers();
     });
 </script>
@@ -29,10 +29,31 @@ img {
 {% block content %}
 <div class="container">
     <div class="page-header">
-        <h1>{{ object.name }}</h1>
+        <h1>{{ object.name|default_if_none:"<em>unknow</em>"|safe }}</h1>
     </div>
     <div class="row">
-        <div class="span6">Details ... {{ point_for_openlayers }} {{ object.point }}</div>
+        <div class="span6">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td>Latitude</td>
+                        <td>{{ object.point.x }}</td>
+                    </tr>
+                    <tr>
+                        <td>Longitude</td>
+                        <td>{{ object.point.y }}</td>
+                    </tr>
+                    <tr>
+                        <td>Religion</td>
+                        <td>{{ object.religion|default_if_none:"<em>unknow</em>"|safe }}</td>
+                    </tr>
+                    <tr>
+                        <td>Denomination</td>
+                        <td>{{ object.denomination|default_if_none:"<em>unknow</em>"|safe }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <div class="span6" style="height: 80%"><div id="map"></div></div>
     </div>
 
