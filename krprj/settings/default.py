@@ -1,7 +1,8 @@
 # Django settings for krprj project.
 
 import os
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+REPO_ROOT = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -95,6 +96,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'krprj.apikey.middleware.ApiKeyMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -106,9 +108,7 @@ ROOT_URLCONF = 'krprj.urls'
 WSGI_APPLICATION = 'krprj.wsgi.application'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    os.path.join(PROJECT_ROOT, "templates")
 )
 
 INSTALLED_APPS = (
@@ -124,6 +124,9 @@ INSTALLED_APPS = (
 
     'krprj.world',
     'krprj.osm',
+    'krprj.worshipmap',
+    'krprj.apikey',
+    'krprj.wikipedia',
     'south',
 )
 
@@ -155,4 +158,3 @@ LOGGING = {
         },
     }
 }
-
