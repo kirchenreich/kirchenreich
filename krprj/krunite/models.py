@@ -5,6 +5,7 @@ from django.utils.timezone import utc
 from krprj.world.models import WorldBorder
 import json
 
+
 class KircheChecks(models.Model):
     """
     """
@@ -17,9 +18,8 @@ class KircheChecks(models.Model):
     osm_address_complete = models.BooleanField(default=False)
 
     wikipedia = models.BooleanField(default=False)
-    
-    wikipedia_infobox = models.BooleanField(default=False)
 
+    wikipedia_infobox = models.BooleanField(default=False)
 
     last_update = models.DateTimeField(default=datetime.utcnow(
             ).replace(tzinfo=utc))
@@ -120,4 +120,3 @@ class KircheUnite(models.Model):
 
     def __unicode__(self):
         return "%d [%s]" % (self.id, self.name or '')
-
