@@ -32,10 +32,9 @@
           </a>
           <a class="brand" href="/">kirchenreich</a>
           <div class="nav-collapse">
-            <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
+            <ul class="nav pull-right">
+              {% block nav_right %}
+              {% endblock %}
             </ul>
           </div><!--/.nav-collapse -->
         </div>

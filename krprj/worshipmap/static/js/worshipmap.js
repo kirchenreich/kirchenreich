@@ -50,6 +50,7 @@ kr.buildMap = function(target_div, center, zoom, use_geolocate){
     };
 
     kr.refresh_markers = function(){
+        $("#nav_status").html('<span class="label label-warning">Loading...</span>');
         kr.request_id++;
         xhr = $.getJSON("/api/v1/places/?epsg=900913&in_bbox=" + kr.map.getExtent().toBBOX() + "&request_id=" + kr.request_id, function(response, status, xhr){
             $("#zoom_in_alert").hide();
@@ -84,11 +85,12 @@ kr.buildMap = function(target_div, center, zoom, use_geolocate){
 
                     kr.markers.addMarker(marker);
                 }
+                $("#nav_status").html('<span class="label label-success">'+ response.places_of_worship_count + ' places</span>');
             }
         }).error(function(){
             if (xhr.status == 422) {
+                $("#nav_status").html('<span class="label label-important"><strong>Please zoom in.</strong> There are to many places of worship to display.</span>');
                 kr.markers.clearMarkers();
-                $("#zoom_in_alert").show();
             }
         });
     };

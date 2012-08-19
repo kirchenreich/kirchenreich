@@ -24,9 +24,11 @@ img {
 </script>
 {% endblock %}
 
+{% block nav_right %}
+<li><a href="#" id="nav_status"></a></li>
+{% endblock %}
+
+
 {% block content %}
-<div class="alert" id="zoom_in_alert" style="display: none; margin-bottom: 5px; margin-top: 5px;">
-  <center><strong>Please zoom in.</strong> There are to many places of worship to display.</center>
-</div>
 <div id="map"></div>
 {% endblock %}
