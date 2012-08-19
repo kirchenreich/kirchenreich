@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 from krprj.krunite.models import KircheUnite
+from django.contrib.gis.geos import Point
 
 
 class CategoryWikipedia(models.Model):
@@ -37,6 +38,8 @@ class KircheWikipedia(models.Model):
 
     sha1 = models.TextField(blank=True, null=True, default=None)
 
+    point = models.PointField(blank=True, null=True)
+
     categories = models.ManyToManyField(CategoryWikipedia,
                                         related_name='categories+')
 
@@ -46,10 +49,23 @@ class KircheWikipedia(models.Model):
     values = models.ManyToManyField(ValueStore,
                                     related_name='values+')
 
-#    unite = models.ForeignKey(KircheUnite, blank=True, null=True)
+    unite = models.ForeignKey(KircheUnite, blank=True, null=True)
 
     objects = models.GeoManager()
 
     def __unicode__(self):
         return "%s" % self.title
 
+    def set_geo(self, lon=None, lat=None):
+        """ set point and mpoly if necessary.
+        a lot have been missed on import.
+        """
+        changed = False
+        if not lon:
+            lon = self.lon
+        if not lat:
+            lat = self.lat
+
+        if not self.point and lon and lat:
+            self.point = Point(lon, lat)
+            self.save()
