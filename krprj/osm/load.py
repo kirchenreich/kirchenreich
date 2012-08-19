@@ -75,11 +75,15 @@ def load_polygon(filename):
                                   x.get('lat')]))
             else:
                 print("missing: %d" % ref)
-
-        kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
-        print kosm.mpoly
+                
+        try:
+            kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
+            print kosm.mpoly
+        except:
+            print tuple(tpl)
 
         kosm.point = kosm.mpoly.centroid
         print kosm.point
 
         kosm.save()
+        print 40*'-'
