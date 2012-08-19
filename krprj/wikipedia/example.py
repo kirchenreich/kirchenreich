@@ -11,7 +11,8 @@ def infobox_test(page, cats):
 #    print ibox
     coords = wikiextractor.find_coords(page)
     if coords:
-        print coords
+        title = wikiextractor.get_title(page)
+        print title, coords
 
 hostname = gethostname()
 
@@ -22,5 +23,5 @@ if hostname == 'ziegensittich':
 
 if filename:
     wikiextractor.run(filename,
-                      r"(place.*worship|church|chapel|mosque|temple)",
+                      r"(place.*worship|church|chapel|mosque|temple|shrine|fane)",
                       infobox_test)
