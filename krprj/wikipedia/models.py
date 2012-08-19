@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 from krprj.krunite.models import KircheUnite
+from django.contrib.gis.geos import Point
 
 
 class CategoryWikipedia(models.Model):
@@ -55,3 +56,16 @@ class KircheWikipedia(models.Model):
     def __unicode__(self):
         return "%s" % self.title
 
+    def set_geo(self, lon=None, lat=None):
+        """ set point and mpoly if necessary.
+        a lot have been missed on import.
+        """
+        changed = False
+        if not lon:
+            lon = self.lon
+        if not lat:
+            lat = self.lat
+
+        if not self.point and lon and lat:
+            self.point = Point(lon, lat)
+            self.save()
