@@ -11,7 +11,7 @@ class WikiExtractor:
 
     def __init__(self, fn, relwords):
         self.fp = codecs.getreader('utf-8')(bz2.BZ2File(fn), errors='replace')
-        self.relre = re.compile(relwords)
+        self.relre = re.compile(relwords, re.IGNORECASE)
 
     def generator(self):
         titlere = re.compile(r'<title>([^<]*)</title>', re.IGNORECASE)
@@ -19,6 +19,7 @@ class WikiExtractor:
         latre = re.compile(r'\|\w*latitude\w*=\w*(\d+(?:\.\d*)?)', re.IGNORECASE)
         lonre = re.compile(r'\|\w*longitude\w*=\w*(\d+(?:\.\d*)?)', re.IGNORECASE)
         coordre = re.compile(r'\{\{coord\|(\d+)\|(\d+)\|(\d+)\|N\|(\d+)\|(\d+)\|(\d+)\|E', re.IGNORECASE)
+        coord2re = re.compile(r'\{\{coord\|(\d+\.\d+)\|(\d+\.\d+)', re.IGNORECASE)
         
         data = []
         cats = []
@@ -27,6 +28,9 @@ class WikiExtractor:
         lat = False
         first = True
         sha1 = False
+        coord_found = False
+        lat_found = False
+        lon_found = False
         relevant = False
         for line in self.fp:
             if line.strip() == '<page>':
@@ -48,24 +52,51 @@ class WikiExtractor:
                 match = sha1re.search(line)
                 if match:
                     sha1 = match.groups()[0]
+            if 'lat_' in line:
+                lat_found = True
+            if 'long_' in line:
+                lon_found = True
+            if 'latitude' in line:
+                lat_found = True
+            if 'longitude' in line:
+                lon_found = True
+            if 'coord|' in line:
+                coord_found = True
             if not (lat and lon):
                 match = coordre.search(line)
                 if match:
+                    coord_found = True
                     lon1 = match.groups()[0:3]
                     lat1 = match.groups()[3:6]
                     lon = int(lon1[0]) + (int(lon1[1]) / 60.0) + (int(lon1[2]) / 3600.0)
                     lat = int(lat1[0]) + (int(lat1[1]) / 60.0) + (int(lat1[2]) / 3600.0)
+                    lon_found = True
+                    lat_found = True
                 else:
-                    match = latre.search(line)
+                    match = coord2re.search(line)
                     if match:
-                        lat = match.groups()[0]
+                        coord_found = True
+                        lon = match.groups()[0]
+                        lat = match.groups()[1]
+                        lon_found = True
+                        lat_found = True
                     else:
-                        match = lonre.search(line)
+                        match = latre.search(line)
                         if match:
-                            lon = match.groups()[0]
+                            lat = match.groups()[0]
+                            lat_found = True
+                        else:
+                            match = lonre.search(line)
+                            if match:
+                                lon = match.groups()[0]
+                                lon_found = True
             if line.strip() == '</page>':
                 if not first:
                     if relevant:
+                        if not (lat and lon):
+                            if coord_found or lat_found or lon_found:
+                                lat = True
+                                lon = True
                         yield (data, cats, title, lon, lat, sha1)
                 data = []
                 cats = []
@@ -74,6 +105,9 @@ class WikiExtractor:
                 lat = False
                 sha1 = False
                 relevant = False
+                coord_found = False
+                lat_found = False
+                lon_found = False
 
 THREADS=4
 q = Queue(THREADS*2)
