@@ -11,6 +11,7 @@ All correlating coordinates to the ways are saved in coords.data in the
 second run.
 """
 
+
 class GetChurches(object):
     """ collect all nodes and ways with amenity="place_of_worship"
     """
@@ -47,6 +48,7 @@ class GetChurches(object):
                 self.fways.write("%s\n" % json.dumps(d))
                 for ref in refs:
                     self.frefs.write("%d\n" % ref)
+
 
 class GetRefs(object):
     """ Get all nodes for ways from first run.
@@ -91,6 +93,55 @@ class GetRefs(object):
             if osmid >= self.osmid:
                 self.osmid = self.nextref()
 
+
+class GetRefsRemaining(object):
+    """ Get all nodes/ways for ways from first run/second.
+    """
+
+    def __init__(self, opts, fn=None):
+        if not fn:
+            fn = os.path.join(opts.datadir, "missing_refs.data.sort")
+        self.loadrefs(fn)
+        self.fcoords = open(os.path.join(opts.datadir, "coords3.data"), "w")
+        self.fways = open(os.path.join(opts.datadir, "ways3.data"), "w")
+        self.frefs = open(os.path.join(opts.datadir, "refs3.data"), "w")
+
+    def __del__(self):
+        self.fcoords.close()
+        self.fways.close()
+        self.frefs.close()
+
+    def loadrefs(self, fn):
+        fp = open(fn, "r")
+        self.mrefs = []
+        for line in fp:
+            self.mrefs.append(int(line.strip()))
+        self.mrefs = set(self.mrefs)
+        fp.close()
+
+    def coords(self, coords):
+        """ save all coords to corresponding refs
+        every line is one node as a dict (in json)
+        """
+        for osmid, lon, lat in coords:
+            if osmid in self.mrefs:
+                d = {'id': osmid, 'lon':lon, 'lat':lat}
+                self.fcoords.write("%s\n" % json.dumps(d))
+                self.mrefs.remove(osmid)
+
+    def ways(self, ways):
+        """ save all ways to corresponding refs
+        every line is one way as a dict (in json)
+        """
+        for osmid, tags, refs in ways:
+            if osmid in self.mrefs:
+                d = {'id': osmid, 'tags':tags, 'refs':refs}
+                self.fcoords.write("%s\n" % json.dumps(d))
+                self.mrefs.remove(osmid)
+                for ref in refs:
+                    self.frefs.write("%d\n" % ref)
+
+
 def options():
     parser = argparse.ArgumentParser(
         description='Extracting data from openstreetmap.')
@@ -105,6 +156,9 @@ def options():
                         action='store_false',
                         help='run second step (extract all reference ' +\
                         'coords in ways)')
+    parser.add_argument('--alt', dest='alt', default=False,
+                        action='store_true',
+                        help='run alternative extraction of coords')
     parser.add_argument('--datadir', dest='datadir', default='data',
                         help='folder for saving extracted data.')
     parser.add_argument('-v', '--verbose', dest='verbose', default=False,
@@ -130,4 +184,11 @@ if __name__=='__main__':
         second = GetRefs(opts)
         p = OSMParser(concurrency=4,
                       coords_callback=second.coords)
+        p.parse(opts.filename)
+    if opts.alt:
+        if opts.verbose:
+            print("alternative run")
+        alt = GetRefsRemaining(opts)
+        p = OSMParser(concurrency=4,
+                      coords_callback=alt.coords)
         p.parse(opts.filename)
