@@ -121,13 +121,13 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.gis',
-
-    'krprj.world',
-    'krprj.osm',
-    'krprj.worshipmap',
-    'krprj.apikey',
-    'krprj.wikipedia',
     'south',
+    'krprj.apikey',
+    'krprj.krunite'
+    'krprj.osm',
+    'krprj.wikipedia',
+    'krprj.world',
+    'krprj.worshipmap',
 )
 
 # A sample logging configuration. The only tangible logging
