@@ -17,7 +17,7 @@ class KircheOsmAdmin(admin.OSMGeoAdmin):
             'fields': ('name', 'religion', 'denomination', 'addional_fields')
         }),
         ('Geo informations', {
-                'fields': ('lon', 'lat', 'mpoly', 'point')
+                'fields': ('lon', 'lat', 'point', 'mpoly')
         }),
     )
 
