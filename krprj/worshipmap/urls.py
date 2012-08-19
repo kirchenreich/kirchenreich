@@ -1,8 +1,7 @@
 from django.conf.urls import patterns, url
 
-from .views import WorshipMapView, GetPlacesInBoxJSONView
+from .views import WorshipMapView
 
 urlpatterns = patterns('worshipmap.views',
     url(r'^$', WorshipMapView.as_view(), name='worshipmap'),
-    url(r'^_get_places$', GetPlacesInBoxJSONView.as_view()),
 )
