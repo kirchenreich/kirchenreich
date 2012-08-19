@@ -71,6 +71,8 @@ class KircheUniteManager(models.Manager):
             self.correlate_osm(elem, KircheWikipedia)
 
     def get_country(self, point):
+        if not point:
+            return None
         try:
             return WorldBorder.objects.get(
                 mpoly__intersects=point)
