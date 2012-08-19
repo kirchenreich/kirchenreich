@@ -62,7 +62,7 @@ class KircheUnite(models.Model):
     created = models.DateTimeField(default=datetime.utcnow)
 
     # manager
-    objects = models.KircheUniteManager()
+    objects = KircheUniteManager()
 
     def __unicode__(self):
         return "%d [%s]" % (self.id, self.name or '')
