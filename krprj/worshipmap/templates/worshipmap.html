@@ -73,8 +73,9 @@ img {
                         } else {
                             var icon = kr.marker_icons['default'].clone()
                         }
-                        var marker = new OpenLayers.Marker(new OpenLayers.LonLat(place.lon, place.lat), icon)
 
+                        var marker = new OpenLayers.Marker(new OpenLayers.LonLat(place.lon, place.lat), icon)
+                        marker.place_id = place.id
 
                         if (place.name === null) {
                             place.name = "unknow"
@@ -87,6 +88,10 @@ img {
                         $(marker.events.element).tooltip({
                             'title': tooltip
                         })
+
+                        marker.events.register("click", marker, function(e){
+                            window.location = "/" + e.object.place_id
+                        });
 
                         kr.markers.addMarker(marker);
                     }
