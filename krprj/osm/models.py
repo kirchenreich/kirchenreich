@@ -37,11 +37,11 @@ class KircheOsm(models.Model):
         if not lat:
             lat = self.lat
 
-        if not self.point:
+        if not self.point and lon and lat:
             self.point = Point(lon, lat)
             changed = True
 
-        if not self.mpoly:
+        if not self.mpoly and lon and lat:
             self.mpoly = MultiPolygon(Polygon(((lon, lat),
                                                (lon, lat),
                                                (lon, lat),
