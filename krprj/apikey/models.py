@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import datetime
+from django.utils.timezone import utc
 from django.contrib.auth.models import User
 
 
@@ -27,7 +28,7 @@ class ApiKey(models.Model):
 
     def login(self, ip_address):
         self.last_ip = ip_address
-        last_used = datetime.utcnow()
+        self.last_used = datetime.utcnow().replace(tzinfo=utc)
         self.save()
 
     def __unicode__(self):
