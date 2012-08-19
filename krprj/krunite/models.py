@@ -1,8 +1,6 @@
 from django.contrib.gis.db import models
 from datetime import datetime
 
-from krprj.osm.models import KircheOsm
-from krprj.wikipedia.models import KircheWikipedia
 from krprj.world.models import WorldBorder
 
 
