@@ -70,32 +70,36 @@ class KircheUniteManager(models.Manager):
         from krprj.wikipedia.models import KircheWikipedia
 
         for elem in KircheOsm.objects.all():
-            if not elem.unite:
-                elem.unite = KircheUnite.objects.create(name=elem.name,
-                                                        point=elem.point)
-            try:
-                wb = WorldBorder.objects.get(mpoly__intersects=elem.point)
-                elem.unite.country = wb
-            except WorldBorder.DoesNotExist:
-                elem.unite.country = None
-            elem.unite.save()
-            if not elem.unite.checks:
-                chks = KircheChecks.objects.create(osm=True)
-            else:
-                chks = elem.unite.checks
-            chks.run()
-            elem.unite.checks = chks
+            self.correlate_osm(elem)
 
-            # find all wikipedia entries within 100 meters
-            pnts = KircheWikipedia.objects.filter(
-                point__distance_lte=(elem.point, 100))
-            if pnts:
-                for pnt in pnts:
-                    elem.unite.kirchewikipedia_set.add(pnt)
-                print elem.unite.kirchewikipedia_set.all()
+    def correlate_osm(self, elem):
+        if not elem.unite:
+            elem.unite = KircheUnite.objects.create(name=elem.name,
+                                                    point=elem.point)
+        try:
+            wb = WorldBorder.objects.get(mpoly__intersects=elem.point)
+            elem.unite.country = wb
+        except WorldBorder.DoesNotExist:
+            elem.unite.country = None
+        elem.unite.save()
+        if not elem.unite.checks:
+            chks = KircheChecks.objects.create(osm=True)
+        else:
+            chks = elem.unite.checks
+        chks.run()
+        elem.unite.checks = chks
 
-            elem.unite.save()
-            elem.save()
+        # find all wikipedia entries within 100 meters
+        pnts = KircheWikipedia.objects.filter(
+            point__distance_lte=(elem.point, 100))
+        if pnts:
+            for pnt in pnts:
+                elem.unite.kirchewikipedia_set.add(pnt)
+            print elem.unite.kirchewikipedia_set.all()
+
+        elem.unite.save()
+        elem.save()
+
 
 
 class KircheUnite(models.Model):
