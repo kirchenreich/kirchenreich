@@ -7,21 +7,17 @@ import models
 import json
 import sys
 
-def inserter(page, cats):
-    ibox = parse_infobox(page)
-    coords = wikiextractor.find_coords(page, ibox)
-    if coords:
-        title = wikiextractor.get_title(page)
-
+def inserter(page, cats, title, lon, lat):
+    if lon and lat:
+        ibox = parse_infobox(page)
         try:
             new_kwiki, created = models.KircheWikipedia.objects.get_or_create(title=title,
                                                                           infobox=json.dumps(ibox),
                                                                           contents=''.join(page),
-                                                                          lon=coords[0],
-                                                                          lat=coords[1])
-            if created:
-                pass
-                #print "created", title
+                                                                          lon=lon,
+                                                                          lat=lat)
+            # if created:
+            #     print "created", title
             sys.stdout.write('.')
             sys.stdout.flush()
         except:

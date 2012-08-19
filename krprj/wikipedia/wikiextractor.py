@@ -14,8 +14,16 @@ class WikiExtractor:
         self.relre = re.compile(relwords)
 
     def generator(self):
+        titlere = re.compile(r'<title>([^<]*)</title>', re.IGNORECASE)
+        latre = re.compile(r'\|\w*latitude\w*=\w*(\d+(?:\.\d*)?)', re.IGNORECASE)
+        lonre = re.compile(r'\|\w*longitude\w*=\w*(\d+(?:\.\d*)?)', re.IGNORECASE)
+        coordre = re.compile(r'\{\{coord\|(\d+)\|(\d+)\|(\d+)\|N\|(\d+)\|(\d+)\|(\d+)\|E', re.IGNORECASE)
+        
         data = []
         cats = []
+        title = False
+        lon = False
+        lat = False
         first = True
         relevant = False
         for line in self.fp:
@@ -30,12 +38,34 @@ class WikiExtractor:
                     if found:
                         relevant = True
                 cats.append(line)
+            if not title:
+                match = titlere.search(line)
+                if match:
+                    title = match.groups()[0]
+            if not lat and lon:
+                match = coordre.search(line)
+                if match:
+                    lon1 = match.groups()[0:3]
+                    lat1 = match.groups()[3:6]
+                    lon = int(lon1[0]) + (int(lon1[1]) / 60.0) + (int(lon1[2]) / 3600.0)
+                    lat = int(lat1[0]) + (int(lat1[1]) / 60.0) + (int(lat1[2]) / 3600.0)
+                else:
+                    match = latre.search(line)
+                    if match:
+                        lat = match.groups()[0]
+                    else:
+                        match = lonre.search(line)
+                        if match:
+                            lon = match.groups()[0]
             if line.strip() == '</page>':
                 if not first:
                     if relevant:
-                        yield (data, cats)
+                        yield (data, cats, title, lon, lat)
                 data = []
                 cats = []
+                title = False
+                lon = False
+                lat = False
                 relevant = False
 
 THREADS=4
@@ -78,8 +108,8 @@ def find_coords(page, ibox=False):
 def spawn(callback, count=THREADS):
     def worker():
         while True:
-            (page, cats) = q.get()
-            callback(page, cats)
+            (page, cats, title, lon, lat) = q.get()
+            callback(page, cats, title, lon, lat)
             q.task_done()
 
     for i in xrange(count):
@@ -90,8 +120,8 @@ def spawn(callback, count=THREADS):
 def run(wikifile, categories, callback, threads=THREADS):
     x = WikiExtractor(wikifile, categories)
     spawn(callback, threads)
-    for page in x.generator():
-        q.put(page)
+    for stuff in x.generator():
+        q.put(stuff)
 
     q.join()
 
