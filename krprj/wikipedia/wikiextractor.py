@@ -7,6 +7,7 @@ from Queue import Queue
 from threading import Thread
 from infobox import parse_infobox
 
+
 class WikiExtractor:
 
     def __init__(self, fn, relwords):
@@ -16,11 +17,16 @@ class WikiExtractor:
     def generator(self):
         titlere = re.compile(r'<title>([^<]*)</title>', re.IGNORECASE)
         sha1re = re.compile(r'<sha1>([^<]*)</sha1>', re.IGNORECASE)
-        latre = re.compile(r'\|\w*latitude\w*=\w*(\d+(?:\.\d*)?)', re.IGNORECASE)
-        lonre = re.compile(r'\|\w*longitude\w*=\w*(\d+(?:\.\d*)?)', re.IGNORECASE)
-        coordre = re.compile(r'\{\{coord\|(\d+)\|(\d+)\|(\d+)\|N\|(\d+)\|(\d+)\|(\d+)\|E', re.IGNORECASE)
-        coord2re = re.compile(r'\{\{coord\|(\d+\.\d+)\|(\d+\.\d+)', re.IGNORECASE)
-        
+        latre = re.compile(r'\|\w*latitude\w*=\w*(\d+(?:\.\d*)?)',
+                           re.IGNORECASE)
+        lonre = re.compile(r'\|\w*longitude\w*=\w*(\d+(?:\.\d*)?)',
+                           re.IGNORECASE)
+        coordre = re.compile(
+            r'\{\{coord\|(\d+)\|(\d+)\|(\d+)\|N\|(\d+)\|(\d+)\|(\d+)\|E',
+            re.IGNORECASE)
+        coord2re = re.compile(r'\{\{coord\|(\d+\.\d+)\|(\d+\.\d+)',
+                              re.IGNORECASE)
+
         data = []
         cats = []
         title = False
@@ -39,7 +45,7 @@ class WikiExtractor:
                 data.append(line)
             if line.strip().startswith('[[Category:'):
                 if not relevant:
-                    ll = line.lower() # TODO do we want lowercase?
+                    ll = line.lower()  # TODO do we want lowercase?
                     found = self.relre.search(ll)
                     if found:
                         relevant = True
@@ -68,8 +74,10 @@ class WikiExtractor:
                     coord_found = True
                     lon1 = match.groups()[0:3]
                     lat1 = match.groups()[3:6]
-                    lon = int(lon1[0]) + (int(lon1[1]) / 60.0) + (int(lon1[2]) / 3600.0)
-                    lat = int(lat1[0]) + (int(lat1[1]) / 60.0) + (int(lat1[2]) / 3600.0)
+                    lon = int(lon1[0]) + (int(lon1[1]) / 60.0) + \
+                        (int(lon1[2]) / 3600.0)
+                    lat = int(lat1[0]) + (int(lat1[1]) / 60.0) + \
+                        (int(lat1[2]) / 3600.0)
                     lon_found = True
                     lat_found = True
                 else:
@@ -109,8 +117,9 @@ class WikiExtractor:
                 lat_found = False
                 lon_found = False
 
-THREADS=4
-q = Queue(THREADS*2)
+THREADS = 4
+q = Queue(THREADS * 2)
+
 
 def get_title(page):
     titlere = re.compile(r'<title>([^<]*)</title>', re.IGNORECASE)
@@ -118,6 +127,7 @@ def get_title(page):
         match = titlere.search(line)
         if match:
             return match.groups()[0]
+
 
 def find_coords(page, ibox=False):
     lat = False
@@ -135,9 +145,12 @@ def find_coords(page, ibox=False):
             lon = ibox['Longitude']
     if lat and lon:
         return (lon, lat)
-    
+
     text = ''.join(page)
-    match = re.search(r'\{\{coord\|(\d+)\|(\d+)\|(\d+)\|N\|(\d+)\|(\d+)\|(\d+)\|E', text, re.IGNORECASE)
+    match = re.search(
+        r'\{\{coord\|(\d+)\|(\d+)\|(\d+)\|N\|(\d+)\|(\d+)\|(\d+)\|E',
+        text,
+        re.IGNORECASE)
     if match:
         lon1 = match.groups()[0:3]
         lat1 = match.groups()[3:6]
@@ -157,7 +170,8 @@ def spawn(callback, count=THREADS):
         t = Thread(target=worker)
         t.daemon = True
         t.start()
-        
+
+
 def run(wikifile, categories, callback, threads=THREADS):
     x = WikiExtractor(wikifile, categories)
     spawn(callback, threads)
@@ -165,4 +179,3 @@ def run(wikifile, categories, callback, threads=THREADS):
         q.put(stuff)
 
     q.join()
-

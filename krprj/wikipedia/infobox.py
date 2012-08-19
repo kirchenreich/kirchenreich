@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 def parse_infobox(page):
     ibox = {}
     text = ''.join(page)
@@ -13,8 +14,8 @@ def parse_infobox(page):
             infobox.append(line)
         if line.lower().strip().startswith('{{infobox'):
             inside = True
-    
-    # WIKIPEDIA MARKUP SUCKS    
+
+    # WIKIPEDIA MARKUP SUCKS
     # start = text.lower().find('{{infobox')
     # if start > -1:
     #     count = 0
@@ -38,11 +39,11 @@ def parse_infobox(page):
     #         if len(elems) > 1:
     #             value = elems[1].strip()
     #         ibox[key] = value
-        
+
     key = ''
     value = ''
     for line in infobox:
-        if line.strip().startswith('|') and '=' in line: 
+        if line.strip().startswith('|') and '=' in line:
             ibox[key] = value
             key = ''
             value = ''
@@ -54,4 +55,3 @@ def parse_infobox(page):
         else:
             value = value + line
     return ibox
-

@@ -5,14 +5,14 @@ from django.contrib.gis.geos import Point
 
 class CategoryWikipedia(models.Model):
     name = models.CharField(max_length=50)
-    language =  models.CharField(max_length=10)
+    language = models.CharField(max_length=10)
 
     def __unicode__(self):
         return "%s [%s]" % (self.name, self.language)
 
 
 class LanguageWikipedia(models.Model):
-    title =  models.CharField(max_length=200)
+    title = models.CharField(max_length=200)
     language = models.CharField(max_length=10)
 
     def __unicode__(self):
@@ -20,7 +20,7 @@ class LanguageWikipedia(models.Model):
 
 
 class ValueStore(models.Model):
-    key =  models.CharField(max_length=50, db_index=True)
+    key = models.CharField(max_length=50, db_index=True)
     value = models.TextField(default='')
 
     def __unicode__(self):
