@@ -89,6 +89,7 @@ class PlacesResource(View):
             places_of_worship.append(_place)
 
         return JSONResponse(
+            request_id=request.GET.get('request_id'),
             places_of_worship=places_of_worship,
             places_of_worship_count=places.count()
         )

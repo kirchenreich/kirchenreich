@@ -1,4 +1,4 @@
-kr = {'last_places_api_response': new Date('01.01.1900')};
+kr = {'request_id': 0};
 
 kr.buildMap = function(target_div, center, zoom, use_geolocate){
     var osm_layer = new OpenLayers.Layer.OSM("OSM Map Layer");
@@ -50,9 +50,9 @@ kr.buildMap = function(target_div, center, zoom, use_geolocate){
     };
 
     kr.refresh_markers = function(){
-        $.getJSON("/api/v1/places/?epsg=900913&in_bbox=" + kr.map.getExtent().toBBOX(), function(response, status, xhr){
-            response_date = new Date(xhr.getResponseHeader('Date'));
-            if (response_date > kr.last_places_api_response) {
+        kr.request_id++;
+        $.getJSON("/api/v1/places/?epsg=900913&in_bbox=" + kr.map.getExtent().toBBOX() + "&request_id=" + kr.request_id, function(response, status, xhr){
+            if (response.request_id == kr.request_id) {
                 kr.markers.clearMarkers();
                 for (var i in response.places_of_worship) {
                     place = response.places_of_worship[i];
@@ -83,7 +83,6 @@ kr.buildMap = function(target_div, center, zoom, use_geolocate){
 
                     kr.markers.addMarker(marker);
                 }
-                kr.last_places_api_response = new Date(xhr.getResponseHeader('Date'));
             }
         });
     };
