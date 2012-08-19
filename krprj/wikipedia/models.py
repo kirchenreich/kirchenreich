@@ -46,7 +46,7 @@ class KircheWikipedia(models.Model):
     values = models.ManyToManyField(ValueStore,
                                     related_name='values+')
 
-#    unite = models.ForeignKey(KircheUnite, blank=True, null=True)
+    unite = models.ForeignKey(KircheUnite, blank=True, null=True)
 
     objects = models.GeoManager()
 
