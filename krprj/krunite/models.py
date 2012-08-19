@@ -82,7 +82,7 @@ class KircheUniteManager(models.Manager):
     def get_wikipedia(self, point, KircheWikipedia):
         # find all wikipedia entries within 100 meters
         if not point:
-            return None
+            return []
         pnts = KircheWikipedia.objects.filter(
             point__distance_lte=(point, 100))
         return pnts
