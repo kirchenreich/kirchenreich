@@ -20,9 +20,14 @@ def inserter(page, cats):
                                                                           lon=coords[0],
                                                                           lat=coords[1])
             if created:
+                pass
                 #print "created", title
+            sys.stdout.write('.')
+            sys.stdout.flush()
         except:
-            sys.stderr.write('!!!!ERROR inserting %s'%title)
+            sys.stderr.write('\n!!!!ERROR inserting %s\n'%title)
+            sys.stderr.flush()
+
 def insert():
     hostname = gethostname()
 
