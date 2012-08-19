@@ -22,6 +22,10 @@ img {
         var center = [{{ point_for_openlayers.x }}, {{ point_for_openlayers.y }}];
         kr.buildMap('map', center, 15, false);
         kr.refresh_markers();
+        if (sessionStorage){
+            kr.session.set_possition(kr.map.getCenter())
+            kr.session.set_zoom(13)
+        }
     });
 </script>
 {% endblock %}

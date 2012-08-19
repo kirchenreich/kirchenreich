@@ -70,12 +70,10 @@ class PlacesResource(View):
 
             # Use the GeoDjango Point type to transform the cordinations in
             # other epsg formats
-            if place.point:
-                point = place.point
-            else:
-                point = Point(place.lon, place.lat)
+            if not place.point:
+                continue
             try:
-                point.transform(request.GET.get('epsg', 4326))
+                place.point.transform(request.GET.get('epsg', 4326))
             except Exception:
                 return JSONResponse(message='Error by epsg transformation',
                                     _code=422)
@@ -83,8 +81,8 @@ class PlacesResource(View):
             _place = {
                 'id': place.id,
                 'name': place.name,
-                'lon': point.x,
-                'lat': point.y,
+                'lon': place.point.x,
+                'lat': place.point.y,
                 'religion': place.religion,
                 'denomination': place.denomination,
             }

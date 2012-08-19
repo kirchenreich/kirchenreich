@@ -19,13 +19,23 @@ img {
 {{ block.super }}
 <script type="text/javascript">
     $(document).ready(function(){
-        kr.buildMap('map', [0, 0], 1, true)
+        kr.buildMap('map', [0, 0], 1, true);
+
+        $("a#geolocate").on('click', kr.run_geolocate);
+        if (!(kr.session.has_possition() && kr.session.has_zoom())) {
+            kr.run_geolocate();
+        }
+
     });
 </script>
 {% endblock %}
 
+{% load humanize %}
 {% block nav_right %}
+<li><a href="#" id="osm_count"><span class="label label-info">OpenStreetMap {{ osm_places_count|intcomma }} places</span></a></li>
+<li><a href="#" id="wikipedia_count"><span class="label label-info">Wikipedia {{ wikipedia_places_count|intcomma }} places</span></a></li>
 <li><a href="#" id="nav_status"></a></li>
+<li><a href="#" id="geolocate"><img src="{{ STATIC_URL }}icons/geolocate.png" height="20px" /></a></li>
 {% endblock %}
 
 
