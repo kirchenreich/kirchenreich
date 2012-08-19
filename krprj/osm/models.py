@@ -3,7 +3,7 @@ from django.contrib.gis.geos import Point, MultiPolygon, Polygon
 
 
 class KircheOsm(models.Model):
-    osm_id = models.IntegerField()
+    osm_id = models.IntegerField(db_index=True)
     name = models.TextField(blank=True, null=True, default=None)
     religion = models.CharField(max_length=200,
                                 blank=True, null=True, default=None)
