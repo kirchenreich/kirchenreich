@@ -10,11 +10,12 @@ def load_nodes(filename):
     fp = codecs.open(filename, encoding='utf-8', mode='r')
     for line in fp:
         data = json.loads(line)
-        new_kosm, created = KircheOsm.objects.get_or_create(lon=data['refs'][0],
-                                                            lat=data['refs'][1],
-                                                            osm_id=data['id'])
-        if not created:
+        if KircheOsm.objects.filter(osm_id=data['id']).count():
             continue
+
+        new_kosm = KircheOsm.objects.create(lon=data['refs'][0],
+                                            lat=data['refs'][1],
+                                            osm_id=data['id'])
         dtags = data.get('tags')
         if 'name' in dtags:
             new_kosm.name = dtags['name']
