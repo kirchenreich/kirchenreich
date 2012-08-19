@@ -3,7 +3,7 @@ from datetime import datetime
 from django.utils.timezone import utc
 
 from krprj.world.models import WorldBorder
-
+import json
 
 class KircheChecks(models.Model):
     """
@@ -21,8 +21,10 @@ class KircheChecks(models.Model):
     wikipedia_infobox = models.BooleanField(default=False)
 
 
-    last_update = models.DateTimeField(default=datetime.utcnow)
-    created = models.DateTimeField(default=datetime.utcnow)
+    last_update = models.DateTimeField(default=datetime.utcnow(
+            ).replace(tzinfo=utc))
+    created = models.DateTimeField(default=datetime.utcnow(
+            ).replace(tzinfo=utc))
 
     def __unicode__(self):
         return "%d [%s]" % (self.id, self.name or '')
@@ -76,8 +78,10 @@ class KircheUnite(models.Model):
 
     checks = models.OneToOneField(KircheChecks, blank=True, null=True)
 
-    last_update = models.DateTimeField(default=datetime.utcnow)
-    created = models.DateTimeField(default=datetime.utcnow)
+    last_update = models.DateTimeField(default=datetime.utcnow(
+            ).replace(tzinfo=utc))
+    created = models.DateTimeField(default=datetime.utcnow(
+            ).replace(tzinfo=utc))
 
     # manager
     objects = KircheUniteManager()
