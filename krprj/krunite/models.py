@@ -46,10 +46,6 @@ class KircheUniteManager(models.Manager):
 
 
 class KircheUnite(models.Model):
-    osm_places = models.ManyToManyField(KircheOsm, blank=True, null=True)
-    wiki_places = models.ManyToManyField(KircheWikipedia, 
-                                         blank=True, null=True)
-
     # only for convenience
     name = models.TextField(blank=True, null=True, default=None)
     point = models.PointField(blank=True, null=True)
