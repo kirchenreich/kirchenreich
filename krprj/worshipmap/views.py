@@ -43,4 +43,8 @@ class PlaceOfWorshipDetailView(DetailView):
             self.object.addional_fields
         )
 
+        context['checks'] = self.object.unite.checks
+        context['wikipedia_pages'] = self.object.unite.kirchewikipedia_set\
+                                                      .all()
+
         return context

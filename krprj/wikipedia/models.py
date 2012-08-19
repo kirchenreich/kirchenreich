@@ -26,7 +26,7 @@ class ValueStore(models.Model):
     def __unicode__(self):
         return "%s" % (self.key)
 
-    
+
 class KircheWikipedia(models.Model):
     title = models.CharField(max_length=200, db_index=True)
 
@@ -55,6 +55,11 @@ class KircheWikipedia(models.Model):
 
     def __unicode__(self):
         return "%s" % self.title
+
+    @property
+    def url(self):
+        title = self.title.replace(' ', '_')
+        return "http://en.wikipedia.org/wiki/%s" % title
 
     def set_geo(self, lon=None, lat=None):
         """ set point and mpoly if necessary.

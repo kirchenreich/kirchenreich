@@ -80,7 +80,16 @@ img {
                         {% endif %}
                     </div>
                     <div class="tab-pane" id="wikipedia">
-                        <p>Wikipedia content....</p>
+                        {% if wikipedia_pages|length > 0 %}
+                        <h3>Wikipedia Article{{ wikipedia_pages|length|pluralize }}</h3>
+                        <ul>
+                            {% for wikipedia_page in wikipedia_pages %}
+                            <li><a href="{{ wikipedia_page.url }}">{{ wikipedia_page }}</a></li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="alert alert-info">This place <strong>isn't</strong> connected with a wikipedia article.</div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
