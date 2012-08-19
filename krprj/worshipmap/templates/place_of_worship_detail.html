@@ -19,11 +19,22 @@ img {
 {{ block.super }}
 <script type="text/javascript">
     $(document).ready(function(){
-        kr.buildMap('map', [0, 0], 1, true)
+        var center = [{{ point_for_openlayers.x }}, {{ point_for_openlayers.y }}];
+        kr.buildMap('map', center, 13, false);
+        kr.refresh_markers();
     });
 </script>
 {% endblock %}
 
 {% block content %}
-<div id="map"></div>
+<div class="container">
+    <div class="page-header">
+        <h1>{{ object.name }}</h1>
+    </div>
+    <div class="row">
+        <div class="span6">Details ... {{ point_for_openlayers }} {{ object.point }}</div>
+        <div class="span6" style="height: 80%"><div id="map"></div></div>
+    </div>
+
+</div>
 {% endblock %}
