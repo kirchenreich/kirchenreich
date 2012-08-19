@@ -126,6 +126,7 @@ INSTALLED_APPS = (
 
     'krprj.world',
     'krprj.apikey',
+    'krprj.wikipedia',
     'south',
 )
 
