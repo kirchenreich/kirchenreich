@@ -50,7 +50,7 @@ Install How-to
   pip install -r requirements.d/dev-standalone.txt
 
 
- * set in krprj/settings/local.py::
+* set in krprj/settings/local.py::
 
   # SECRET_KEY - see http://www.miniwebtool.com/django-secret-key-generator/
   # DATABASES - see settings.py for template without user/pw
