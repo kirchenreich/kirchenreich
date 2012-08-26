@@ -29,6 +29,7 @@ def load_nodes(filename):
             del dtags['denomination']
         del dtags['amenity']
         kosm.addional_fields = json.dumps(dtags)
+        kosm.osm_type = 'N'
 
         # set mpoly and point in dataset
         kosm.set_geo()
@@ -70,6 +71,7 @@ def load_polygon(filename):
             del dtags['denomination']
         del dtags['amenity']
         kosm.addional_fields = json.dumps(dtags)
+        kosm.osm_type = 'W'
 
         tpl = []
         for ref in data.get('refs'):
