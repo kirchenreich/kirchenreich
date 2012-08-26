@@ -1,7 +1,7 @@
 kirchenreich
 ============
 
-This is a Django Dash 2012 project.
+Place #7 in Django Dash 2012.
 
 
 About
@@ -16,7 +16,7 @@ We want to **encourage** users to fix the problems in Wikipedia and Openstreetma
 Of course this site not only has churches, but all **places of worship**.
 
 We developed this site for the `DjangoDash <http://djangodash.com>`_ **at one weekend**.
-Hopefully we find time to improve the site in the future.
+We will improve this site in the future.
 The whole sourcecode is on `Github <https://github.com/mfa/kirchenreich>`_ under BSD licence.
 
 Feel free to fork the repository, file bugrequests or even send in feature wishes.
