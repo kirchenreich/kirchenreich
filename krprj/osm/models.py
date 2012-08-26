@@ -8,6 +8,13 @@ import json
 
 class KircheOsm(models.Model):
     osm_id = models.IntegerField(db_index=True)
+    TYPE_CHOICES = (
+            ('N','node'),
+            ('W','way'),
+            )
+    osm_type = models.CharField(max_length=5, choices = TYPE_CHOICES,
+                                default='')
+
     name = models.TextField(blank=True, null=True, default=None)
     religion = models.CharField(max_length=200,
                                 blank=True, null=True, default=None)
