@@ -36,7 +36,7 @@ class PlaceOfWorshipDetailView(DetailView):
         # Need point of place in EPSG:900913 for OpenLayers but don't want to
         # change self.object.point
         point = copy(self.object.point)
-        point.transform(900913)
+        point.transform(3857)
         context['point_for_openlayers'] = point
 
         context['addional_fields'] = json.loads(

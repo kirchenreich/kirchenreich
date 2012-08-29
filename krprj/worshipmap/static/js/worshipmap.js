@@ -30,7 +30,7 @@ kr.session.get_zoom = function(){
 kr.refresh_markers = function(){
     $("#nav_status").html('<span class="label label-warning">Loading...</span>');
     kr.request_id++;
-    xhr = $.getJSON("/api/v1/places/?epsg=900913&in_bbox=" + kr.map.getExtent().toBBOX() + "&request_id=" + kr.request_id, function(response, status, xhr){
+    xhr = $.getJSON("/api/v1/places/?epsg=3857&in_bbox=" + kr.map.getExtent().toBBOX() + "&request_id=" + kr.request_id, function(response, status, xhr){
         $("#zoom_in_alert").hide();
         if (response.request_id == kr.request_id) {
             kr.markers.clearMarkers();
