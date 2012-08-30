@@ -112,7 +112,7 @@ TEMPLATE_DIRS = (
     os.path.join(PROJECT_ROOT, "templates")
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -130,7 +130,7 @@ INSTALLED_APPS = (
     'krprj.wikipedia',
     'krprj.world',
     'krprj.worshipmap',
-)
+]
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
