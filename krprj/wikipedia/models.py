@@ -1,5 +1,4 @@
 from django.contrib.gis.db import models
-from krprj.krunite.models import KircheUnite
 from django.contrib.gis.geos import Point
 
 
@@ -49,7 +48,7 @@ class KircheWikipedia(models.Model):
     values = models.ManyToManyField(ValueStore,
                                     related_name='values+')
 
-    unite = models.ForeignKey(KircheUnite, blank=True, null=True)
+    unite = models.ForeignKey("krunite.KircheUnite", blank=True, null=True)
 
     objects = models.GeoManager()
 

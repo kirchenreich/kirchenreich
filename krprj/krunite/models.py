@@ -3,6 +3,7 @@ from datetime import datetime
 from django.utils.timezone import utc
 
 from krprj.world.models import WorldBorder
+from krprj.wikipedia.models import KircheWikipedia
 import json
 
 
@@ -61,6 +62,27 @@ class KircheChecks(models.Model):
 
 
 class KircheUniteManager(models.Manager):
+
+    def get_by_osm_or_create(self, osm):
+        """Get a KircheUnit object for KircheOsm object. If there no
+        KircheUnite object than it will be create a new one and set name
+        and point in the unite object from the Osm object.
+        """
+
+        unite_objs = self.filter(kircheosm=osm)
+        if unite_objs.count() == 0:
+            unite = self.model()
+            unite.name = osm.name
+            unite.point = osm.point
+            unite.save()
+
+            osm.unite = unite
+            osm.save()
+
+            # This is not perfect but it's working
+            return self.filter(kircheosm=osm)
+
+        return unite_objs
 
     def correlate_all_osm(self):
         """ correlate osm datasets with wikipedia datasets
@@ -131,3 +153,29 @@ class KircheUnite(models.Model):
 
     def __unicode__(self):
         return "%d [%s]" % (self.id, self.name or '')
+
+    def update_wikipedia(self):
+        if self.point is None:
+            return
+
+        articles = KircheWikipedia.objects.filter(
+            point__distance_lte=(self.point, 100)
+        )
+        self.kirchewikipedia_set.add(*articles)
+        return articles
+
+    def update_country(self):
+        """Take the point of the unite object and update the country into the
+        database and return the result.
+        """
+        if self.point is None:
+            return None
+
+        try:
+            self.country = WorldBorder.objects.get(
+                mpoly__intersects=self.point
+            )
+            self.save()
+            return self.country
+        except WorldBorder.DoesNotExist:
+            return None
