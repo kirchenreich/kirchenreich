@@ -22,23 +22,36 @@ class KircheChecks(models.Model):
 
     wikipedia_infobox = models.BooleanField(default=False)
 
-    last_update = models.DateTimeField(default=datetime.utcnow(
-            ).replace(tzinfo=utc))
-    created = models.DateTimeField(default=datetime.utcnow(
-            ).replace(tzinfo=utc))
+    last_update = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return "%d [%s]" % (self.id, self.name or '')
+        return "%d [%s] (%s/%s)" % (self.id, self.kircheunite.name or '',
+                                    self.achieved, self.available)
 
-    def save(self, *args, **kwargs):
-        self.last_update = datetime.utcnow().replace(tzinfo=utc)
-        super(KircheChecks, self).save(*args, **kwargs)
+    @property
+    def available(self):
+        count = 0
+        for field in self._meta.fields:
+            if isinstance(field, models.BooleanField):
+                count += 1
+        return count
 
-    def sum_checks(self):
-        # FIXME: not count last_update and created!!
-        return sum([field for field in KircheChecks._meta.fields])
+    @property
+    def achieved(self):
+        count = 0
+        for field in self._meta.fields:
+            if isinstance(field, models.BooleanField):
+                count += int(getattr(self, field.name))
+        return count
 
-    def run(self):
+    def _run(self):
+        """Don't run this method directly!
+        Use KircheUnite.update_checks() instead.
+
+        Run some quality checks over the osm and wikipedia objects.
+        """
+
         if self.kircheunite:
             for osm in self.kircheunite.kircheosm_set.all():
                 self.osm = True
@@ -59,6 +72,8 @@ class KircheChecks(models.Model):
                 self.wikipedia = True
                 if len(wiki.infobox) > 3:
                     self.wikipedia_infobox = True
+
+            self.save()
 
 
 class KircheUniteManager(models.Manager):
@@ -84,50 +99,6 @@ class KircheUniteManager(models.Manager):
 
         return unite_objs
 
-    def correlate_all_osm(self):
-        """ correlate osm datasets with wikipedia datasets
-        """
-        from krprj.osm.models import KircheOsm
-        from krprj.wikipedia.models import KircheWikipedia
-        for elem in KircheOsm.objects.all():
-            self.correlate_osm(elem, KircheWikipedia)
-
-    def get_country(self, point):
-        if not point:
-            return None
-        try:
-            return WorldBorder.objects.get(
-                mpoly__intersects=point)
-        except WorldBorder.DoesNotExist:
-            return None
-
-    def get_wikipedia(self, point, KircheWikipedia):
-        # find all wikipedia entries within 100 meters
-        if not point:
-            return []
-        pnts = KircheWikipedia.objects.filter(
-            point__distance_lte=(point, 100))
-        return pnts
-
-    def correlate_osm(self, elem, KircheWikipedia):
-        if not elem.unite:
-            elem.unite = KircheUnite.objects.create(name=elem.name,
-                                                    point=elem.point)
-        elem.unite.country = self.get_country(elem.point)
-        elem.unite.save()
-
-        # commented for later use.
-#        elem.unite.checks = KircheChecks.objects.get_or_create(
-#            kircheunite=elem.unite.id)
-#        elem.unite.checks.run()
-
-        for pnt in self.get_wikipedia(elem.point, KircheWikipedia):
-            elem.unite.kirchewikipedia_set.add(pnt)
-            print elem.unite.kirchewikipedia_set.all()
-
-        elem.unite.save()
-        elem.save()
-
 
 class KircheUnite(models.Model):
     """ Table for joining osm and wikipedia datasets.
@@ -143,10 +114,8 @@ class KircheUnite(models.Model):
 
     checks = models.OneToOneField(KircheChecks, blank=True, null=True)
 
-    last_update = models.DateTimeField(default=datetime.utcnow(
-            ).replace(tzinfo=utc))
-    created = models.DateTimeField(default=datetime.utcnow(
-            ).replace(tzinfo=utc))
+    last_update = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     # manager
     objects = KircheUniteManager()
@@ -179,3 +148,11 @@ class KircheUnite(models.Model):
             return self.country
         except WorldBorder.DoesNotExist:
             return None
+
+    def update_checks(self):
+        if self.checks is None:
+            self.checks = KircheChecks()
+            self.checks.save()
+            self.save()
+
+        self.checks._run()
