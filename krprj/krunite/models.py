@@ -31,6 +31,7 @@ class KircheChecks(models.Model):
 
     @property
     def available(self):
+        """This property returns the count of available checks."""
         count = 0
         for field in self._meta.fields:
             if isinstance(field, models.BooleanField):
@@ -39,6 +40,8 @@ class KircheChecks(models.Model):
 
     @property
     def achieved(self):
+        """Instead to available() this property returns the count of achieved
+        checks by the unite object."""
         count = 0
         for field in self._meta.fields:
             if isinstance(field, models.BooleanField):
@@ -124,6 +127,9 @@ class KircheUnite(models.Model):
         return "%d [%s]" % (self.id, self.name or '')
 
     def update_wikipedia(self):
+        """Try to find some wikipedia objects within a radius of 100m to the
+        point of the unite object.
+        """
         if self.point is None:
             return
 
@@ -150,6 +156,7 @@ class KircheUnite(models.Model):
             return None
 
     def update_checks(self):
+        """Update/Create the check object and run the available checks"""
         if self.checks is None:
             self.checks = KircheChecks()
             self.checks.save()
