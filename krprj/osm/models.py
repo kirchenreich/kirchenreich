@@ -37,10 +37,8 @@ class KircheOsm(models.Model):
 
     objects = models.GeoManager()
 
-    last_update = models.DateTimeField(auto_now=True, default=datetime.utcnow(
-            ).replace(tzinfo=utc))
-    created = models.DateTimeField(auto_now_add=True, default=datetime.utcnow(
-            ).replace(tzinfo=utc))
+    last_update = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return "%s (%s) [%s]" % (self.id, self.name or '', self.religion or '')
