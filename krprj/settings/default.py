@@ -1,6 +1,11 @@
 # Django settings for krprj project.
 
 import os
+
+# Celery
+import djcelery
+djcelery.setup_loader()
+
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             os.pardir))
 REPO_ROOT = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir))
@@ -124,6 +129,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'django.contrib.humanize',
     'south',
+    'djcelery',
     'krprj.apikey',
     'krprj.krunite',
     'krprj.osm',
@@ -160,3 +166,8 @@ LOGGING = {
         },
     }
 }
+
+# More celery
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+

@@ -160,6 +160,8 @@ class KircheUnite(models.Model):
         if self.checks is None:
             self.checks = KircheChecks()
             self.checks.save()
+
+            self.checks_id = self.checks.id
             self.save()
 
         self.checks._run()
