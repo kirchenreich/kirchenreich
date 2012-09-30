@@ -6,42 +6,6 @@ import sys
 
 from .models import KircheOsm
 
-class GetChurches(object):
-    """ collect all nodes and ways with amenity="place_of_worship"
-    """
-
-    def nodes(self, nodes):
-        """ create for every place_of_worship node a task 
-        """
-        for osmid, tags, refs in nodes:
-            if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
-                d = {'id': osmid, 'tags': tags, 'refs': refs}
-                ## add task to celery
-                insert_church_node.apply_asyc(args=[d], countdown=1)
-
-    def ways(self, ways):
-        """ create for every place_of_worship way a task 
-        """
-        for osmid, tags, refs in ways:
-            if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
-                d = {'id': osmid, 'tags': tags, 'refs': refs}
-                ## add task to celery -- add refs needed for ways
-                insert_refs_needed.apply_asyc(args=[refs])
-                ## add task to celery -- insert way / execute later (1h)
-                insert_church_way.apply_async(args=[d], countdown=3600)
-
-@task
-def add_churches(filename):
-    first = GetChurches()
-    p = OSMParser(concurrency=4,
-                  nodes_callback=first.nodes)
-#                  ways_callback=first.ways)
-    p.parse(filename)
-
-    # TODO: fill all refs missing in database 
-
-    return True
-
 @task
 def insert_church_node(data):
     # write updates ids for debugging
@@ -79,3 +43,40 @@ def insert_refs_needed(refs):
 @task
 def insert_church_way(data):
     pass
+
+class GetChurches(object):
+    """ collect all nodes and ways with amenity="place_of_worship"
+    """
+
+    def nodes(self, nodes):
+        """ create for every place_of_worship node a task 
+        """
+        for osmid, tags, refs in nodes:
+            if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
+                d = {'id': osmid, 'tags': tags, 'refs': refs}
+                ## add task to celery
+                insert_church_node.apply_asyc(args=[d], countdown=1)
+
+    def ways(self, ways):
+        """ create for every place_of_worship way a task 
+        """
+        for osmid, tags, refs in ways:
+            if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
+                d = {'id': osmid, 'tags': tags, 'refs': refs}
+                ## add task to celery -- add refs needed for ways
+                insert_refs_needed.apply_asyc(args=[refs])
+                ## add task to celery -- insert way / execute later (1h)
+                insert_church_way.apply_async(args=[d], countdown=3600)
+
+@task
+def add_churches(filename):
+    first = GetChurches()
+    p = OSMParser(concurrency=4,
+                  nodes_callback=first.nodes)
+#                  ways_callback=first.ways)
+    p.parse(filename)
+
+    # TODO: fill all refs missing in database 
+
+    return True
+
