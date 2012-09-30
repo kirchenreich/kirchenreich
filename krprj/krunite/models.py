@@ -1,10 +1,8 @@
+import json
 from django.contrib.gis.db import models
-from datetime import datetime
-from django.utils.timezone import utc
 
 from krprj.world.models import WorldBorder
 from krprj.wikipedia.models import KircheWikipedia
-import json
 
 
 class KircheChecks(models.Model):
@@ -27,26 +25,27 @@ class KircheChecks(models.Model):
 
     def __unicode__(self):
         return "%d [%s] (%s/%s)" % (self.id, self.kircheunite.name or '',
-                                    self.achieved, self.available)
+                                    len(self.achieved), len(self.available))
 
     @property
     def available(self):
-        """This property returns the count of available checks."""
-        count = 0
+        """This property returns a list of available checks."""
+        checks = []
         for field in self._meta.fields:
             if isinstance(field, models.BooleanField):
-                count += 1
-        return count
+                checks.append(field.name)
+        return checks
 
     @property
     def achieved(self):
-        """Instead to available() this property returns the count of achieved
+        """Instead to available() this property returns the list of achieved
         checks by the unite object."""
-        count = 0
+        checks = []
         for field in self._meta.fields:
-            if isinstance(field, models.BooleanField):
-                count += int(getattr(self, field.name))
-        return count
+            if isinstance(field, models.BooleanField) \
+            and getattr(self, field.name):
+                checks.append(field.name)
+        return checks
 
     def _run(self):
         """Don't run this method directly!
@@ -104,7 +103,7 @@ class KircheUniteManager(models.Manager):
 
 
 class KircheUnite(models.Model):
-    """ Table for joining osm and wikipedia datasets.
+    """ Model for joining osm and wikipedia objects.
     ForeignKeys are from KircheOsm (kircheosm) and
                          KircheWikipedia (kirchewikipedia)
     """
