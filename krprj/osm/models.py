@@ -4,7 +4,8 @@ from django.contrib.gis.geos import Point, MultiPolygon, Polygon
 from krprj.krunite.models import KircheUnite
 
 import json
-
+from datetime import datetime
+from django.utils.timezone import utc
 
 class KircheOsm(models.Model):
     osm_id = models.IntegerField(db_index=True)
@@ -35,6 +36,11 @@ class KircheOsm(models.Model):
     unite = models.ForeignKey(KircheUnite, blank=True, null=True)
 
     objects = models.GeoManager()
+
+    last_update = models.DateTimeField(auto_now=True, default=datetime.utcnow(
+            ).replace(tzinfo=utc))
+    created = models.DateTimeField(auto_now_add=True, default=datetime.utcnow(
+            ).replace(tzinfo=utc))
 
     def __unicode__(self):
         return "%s (%s) [%s]" % (self.id, self.name or '', self.religion or '')
