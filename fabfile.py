@@ -89,4 +89,5 @@ def deploy():
     collectstatic()
     migrate()
     reload_gunicorn()
+    restart_celery()
     puts(green("Deployment done!"))
