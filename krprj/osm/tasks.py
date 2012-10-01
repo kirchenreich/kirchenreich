@@ -35,6 +35,7 @@ def insert_church_node(data):
     # set mpoly and point in dataset
     kosm.set_geo()
     kosm.save()
+    return True
 
 @task
 def insert_refs_needed(refs):
