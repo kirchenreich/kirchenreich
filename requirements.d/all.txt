@@ -2,3 +2,4 @@ Django==1.4.1
 psycopg2
 South==0.7.6
 django-celery-with-redis
+pytz
