@@ -1,4 +1,6 @@
 from django.contrib.gis import admin
+
+from krprj.krunite.tasks import unite_osm_list
 from models import KircheOsm
 
 
@@ -20,5 +22,12 @@ class KircheOsmAdmin(admin.OSMGeoAdmin):
                 'fields': ('lon', 'lat', 'point', 'mpoly')
         }),
     )
+
+    actions = ['update_unite']
+
+    def update_unite(self, request, queryset):
+        unite_osm_list.delay(queryset)
+        self.message_user(request, "Started %s tasks." % queryset.count())
+    update_unite.short_description = "Update selected osm -> unite objects"
 
 admin.site.register(KircheOsm, KircheOsmAdmin)

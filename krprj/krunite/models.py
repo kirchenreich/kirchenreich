@@ -114,8 +114,8 @@ class KircheUnite(models.Model):
 
     country = models.ForeignKey(WorldBorder, blank=True, null=True)
 
-    checks = models.OneToOneField(KircheChecks, blank=True, null=True)
-
+    checks = models.OneToOneField(KircheChecks, related_name='unite',
+                                  blank=True, null=True)
     last_update = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
