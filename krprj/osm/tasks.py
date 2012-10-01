@@ -55,7 +55,7 @@ class GetChurches(object):
             if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
                 d = {'id': osmid, 'tags': tags, 'refs': refs}
                 ## add task to celery
-                insert_church_node.apply_asyc(args=[d], countdown=1)
+                insert_church_node.apply_async(args=[d])
 
     def ways(self, ways):
         """ create for every place_of_worship way a task 
@@ -64,7 +64,7 @@ class GetChurches(object):
             if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
                 d = {'id': osmid, 'tags': tags, 'refs': refs}
                 ## add task to celery -- add refs needed for ways
-                insert_refs_needed.apply_asyc(args=[refs])
+                insert_refs_needed.apply_async(args=[refs])
                 ## add task to celery -- insert way / execute later (1h)
                 insert_church_way.apply_async(args=[d], countdown=3600)
 
