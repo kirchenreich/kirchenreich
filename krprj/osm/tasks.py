@@ -6,14 +6,7 @@ import sys
 
 from .models import KircheOsm, Ref
 
-@task
-def insert_church_node(data):
-    kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
-
-    kosm.lon = data['refs'][0]
-    kosm.lat = data['refs'][1]
-
-    dtags = data.get('tags')
+def set_tags(kosm, dtags):
     if 'name' in dtags:
         kosm.name = dtags['name']
         del dtags['name']
@@ -25,12 +18,66 @@ def insert_church_node(data):
         del dtags['denomination']
     del dtags['amenity']
     kosm.addional_fields = json.dumps(dtags)
+    return kosm
+
+
+@task
+def insert_church_node(data):
+    kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
+
+    kosm.lon = data['refs'][0]
+    kosm.lat = data['refs'][1]
+
+    kosm = set_tags(kosm, data.get('tags'))
     kosm.osm_type = 'N'
 
     # set mpoly and point in dataset
     kosm.set_geo()
     kosm.save()
     return True
+
+
+@task
+def insert_church_way(data):
+    """ Insert church based on way(s).
+    Needs references to points for creating the way(s)
+    """
+    # are all refs in database?
+    ref_tuples = []
+    for ref in data.get('refs'):
+        x = Ref.objects.filter(osm_id=ref)
+        if x:
+            tpl.append(x.point.tuple)
+        else:
+            # not yet done / postpone one day
+            raise insert_church_way(args=[data], countdown=3600)
+            # or return False ??
+
+    # now add dataset
+    kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
+
+    kosm.lon = data['refs'][0]
+    kosm.lat = data['refs'][1]
+
+    kosm = set_tags(kosm, data.get('tags'))
+    kosm.osm_type = 'W'
+
+    try:
+        kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
+        kosm.point = kosm.mpoly.centroid
+    except:
+        try:
+            # add first point at the end to close the ring.
+            tpl.append(tpl[0])
+            kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
+            kosm.point = kosm.mpoly.centroid
+        except:
+            # FIXME: should send us a message
+            pass
+
+    kosm.save()
+    return True
+
 
 @task
 def insert_refs_needed(refs):
@@ -43,15 +90,6 @@ def insert_refs_needed(refs):
         ref.save()
     return True
 
-@task
-def insert_church_way(data):
-    """ Insert church based on way(s).
-    Needs references to points for creating the way(s)
-    """
-
-    # FIXME
-
-    return True
 
 ################################################################################
 
@@ -123,3 +161,6 @@ def update_refs(filename):
     return True
 
 
+# run it:
+#import krprj.osm.tasks as t
+#t.add_churches("/srv/spielwiese/stuttgart-regbez.osm")
