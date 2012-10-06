@@ -105,7 +105,7 @@ def add_churches(filename):
     # get churches
     churches = GetChurches()
     p = OSMParser(concurrency=4,
-                  nodes_callback=churches.nodes
+                  nodes_callback=churches.nodes,
                   ways_callback=churches.ways)
     p.parse(filename)
     
