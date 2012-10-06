@@ -108,12 +108,18 @@ def add_churches(filename):
                   nodes_callback=churches.nodes
                   ways_callback=churches.ways)
     p.parse(filename)
+    
+    update_refs.apply_async(args=[filename])
+    return True
 
+
+@task
+def update_refs(filename):
     # get refs
     refs = GetRefs(opts)
     p = OSMParser(concurrency=4,
                   coords_callback=refs.coords)
     p.parse(filename)
-
     return True
+
 
