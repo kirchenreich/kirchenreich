@@ -95,3 +95,14 @@ class Ref(models.Model):
 
     def __unicode__(self):
         return "%s (%s)" % (self.id, self.osm_id)
+
+    def set_point(self, lon=None, lat=None):
+        """ set point if necessary.
+        """
+        changed = False
+        if not self.point and lon and lat:
+            self.point = Point(lon, lat)
+            changed = True
+        if changed:
+            self.save()
+        return changed

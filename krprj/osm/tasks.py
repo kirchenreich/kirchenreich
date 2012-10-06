@@ -4,15 +4,10 @@ import json
 import os.path
 import sys
 
-from .models import KircheOsm
+from .models import KircheOsm, Ref
 
 @task
 def insert_church_node(data):
-    # write updates ids for debugging
-    fp = open('/tmp/foo.log', 'a')
-    fp.write('%s\n' % data['id'])
-    fp.close()
-    ##
     kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
 
     kosm.lon = data['refs'][0]
@@ -39,11 +34,26 @@ def insert_church_node(data):
 
 @task
 def insert_refs_needed(refs):
-    pass
+    """ Insert alls refs needed to create the ways for polygon-based churches.
+    """
+    for ref_id in refs:
+        ref, created = Ref.objects.get_or_create(osm_id=ref_id)
+        if not created:
+            ref.need_update = True
+        ref.save()
+    return True
 
 @task
 def insert_church_way(data):
-    pass
+    """ Insert church based on way(s).
+    Needs references to points for creating the way(s)
+    """
+
+    # FIXME
+
+    return True
+
+################################################################################
 
 class GetChurches(object):
     """ collect all nodes and ways with amenity="place_of_worship"
@@ -69,15 +79,41 @@ class GetChurches(object):
                 ## add task to celery -- insert way / execute later (1h)
                 insert_church_way.apply_async(args=[d], countdown=3600)
 
+
+class GetRefs(object):
+    """ Get all nodes for ways from first run.
+    """
+
+    def __init__(self):
+        self.ref_id_list = Ref.objects.filter(need_update=True)
+
+    def coords(self, coords):
+        """ save all coords to corresponding ref dataset
+        """
+        for osmid, lon, lat in coords:
+            if osmid in self.ref_id_list:
+                ref_obj = Ref.objects.get(osm_id=osmid)
+                ref_obj.set_point(lon, lat)
+                ref_obj.need_update=False
+                ref_obj.save()
+                self.ref_id_list.remove(osmid)
+
+################################################################################
+
 @task
 def add_churches(filename):
-    first = GetChurches()
+    # get churches
+    churches = GetChurches()
     p = OSMParser(concurrency=4,
-                  nodes_callback=first.nodes)
-#                  ways_callback=first.ways)
+                  nodes_callback=churches.nodes
+                  ways_callback=churches.ways)
     p.parse(filename)
 
-    # TODO: fill all refs missing in database 
+    # get refs
+    refs = GetRefs(opts)
+    p = OSMParser(concurrency=4,
+                  coords_callback=refs.coords)
+    p.parse(filename)
 
     return True
 
