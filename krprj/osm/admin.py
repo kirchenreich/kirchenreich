@@ -26,6 +26,7 @@ admin.site.register(KircheOsm, KircheOsmAdmin)
 
 class RefAdmin(admin.OSMGeoAdmin):
     fields = ('osm_id', 'need_update', 'last_update', 'created')
+    list_filter = ['need_update']
     readonly_fields = ('last_update', 'created')
 
 admin.site.register(Ref, RefAdmin)
