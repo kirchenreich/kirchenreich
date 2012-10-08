@@ -3,3 +3,4 @@ psycopg2
 South==0.7.6
 django-celery-with-redis
 imposm.parser
+pytz

@@ -1,5 +1,5 @@
 from django.contrib.gis import admin
-from models import KircheOsm
+from models import KircheOsm, Ref
 
 
 class KircheOsmAdmin(admin.OSMGeoAdmin):
@@ -22,3 +22,10 @@ class KircheOsmAdmin(admin.OSMGeoAdmin):
     )
 
 admin.site.register(KircheOsm, KircheOsmAdmin)
+
+
+class RefAdmin(admin.OSMGeoAdmin):
+    fields = ('osm_id', 'need_update', 'last_update', 'created')
+    readonly_fields = ('last_update', 'created')
+
+admin.site.register(Ref, RefAdmin)

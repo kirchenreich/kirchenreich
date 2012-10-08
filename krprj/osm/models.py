@@ -80,3 +80,29 @@ class KircheOsm(models.Model):
              'unite': self.unite
              }
         return json.dumps(d)
+
+
+class Ref(models.Model):
+    """ table for caching references needed for ways
+    """
+    osm_id = models.IntegerField(db_index=True)
+    point = models.PointField(blank=True, null=True)
+
+    need_update = models.BooleanField(default=True)
+
+    last_update = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return "%s (%s)" % (self.id, self.osm_id)
+
+    def set_point(self, lon=None, lat=None):
+        """ set point if necessary.
+        """
+        changed = False
+        if not self.point and lon and lat:
+            self.point = Point(lon, lat)
+            changed = True
+        if changed:
+            self.save()
+        return changed
