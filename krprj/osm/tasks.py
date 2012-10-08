@@ -45,7 +45,10 @@ def insert_church_way(data):
     # are all refs in database?
     ref_tuples = []
     for ref in data.get('refs'):
-        x = Ref.objects.get_or_none(osm_id=ref)
+        try:
+            x = Ref.objects.get(osm_id=ref)
+        except Ref.DoesNotExist:
+            x = None
         if x and not x.need_update:
             ref_tuples.append(x.point.tuple)
         else:
