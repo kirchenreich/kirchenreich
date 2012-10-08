@@ -125,26 +125,51 @@ class GetChurches(object):
 
 class GetRefs(object):
     """ Get all nodes for ways from first run.
+
+    This class uses two methods to get all refs.
+    If the length of the list is below 100 it uses the full list.
+    If the length of the list is longer than 100 it iterates over the sorted list.
+    This is important because in the openstreetmap planet we need to find over
+    one million refs.
     """
 
     def __init__(self):
-        self.ref_id_list = Ref.objects.filter(need_update=True).order_by('osm_id')
-        self.ref_list_len = len(self.ref_id_list)
-        self.this_ref_index = 0
+        self.ref_id_list = Ref.objects.filter(
+            need_update=True).order_by('osm_id').values_list('osm_id')
+        self.use_full_list = False
+        if len(self.ref_id_list) < 100:
+            self.use_full_list = True
+            self.this_values = map(lambda x:x[0], self.ref_id_list)
+        else:
+            self.ref_list_len = len(self.ref_id_list)
+            self.this_ref_index = 0
+            self.this_value = self.get_value()
+
+    def get_value(self):
+        return self.ref_id_list[self.this_ref_index][0]
+
+    def update_ref(self, osmid, lat, lon):
+        ref_obj = Ref.objects.get(osm_id=osmid)
+        ref_obj.set_point(lon, lat)
+        ref_obj.need_update = False
+        ref_obj.save()
 
     def coords(self, coords):
         """ save all coords to corresponding ref dataset
         """
         for osmid, lon, lat in coords:
-            if osmid == self.ref_id_list[self.this_ref_index]:
-                ref_obj = Ref.objects.get(osm_id=osmid)
-                ref_obj.set_point(lon, lat)
-                ref_obj.need_update = False
-                ref_obj.save()
-            if osmid >= self.ref_id_list[self.this_ref_index]:
-                self.this_ref_index += 1
-                if self.this_ref_index >= self.ref_list_len:
-                    break
+            if self.use_full_list:
+                if osmid in self.this_values:
+                    self.update_ref(osmid, lat, lon)
+                    self.this_values.remove(osmid)
+            else:
+                if osmid == self.this_value:
+                    self.update_ref(osmid, lat, lon)
+                if osmid >= self.this_value:
+                    self.this_ref_index += 1
+                    if self.this_ref_index >= self.ref_list_len:
+                        break
+                    self.this_value = self.get_value()
 
 ################################################################################
 
@@ -168,6 +193,10 @@ def update_refs(filename):
     p = OSMParser(concurrency=4,
                   coords_callback=refs.coords)
     p.parse(filename)
+
+    if len(Ref.objects.filter(need_update=True))>0:
+        update_refs.apply_async(args=[filename])
+
     return True
 
 
