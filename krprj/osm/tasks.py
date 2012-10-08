@@ -45,11 +45,11 @@ def insert_church_way(data):
     # are all refs in database?
     ref_tuples = []
     for ref in data.get('refs'):
-        x = Ref.objects.get(osm_id=ref)
+        x = Ref.objects.get_or_none(osm_id=ref)
         if x and not x.need_update:
             ref_tuples.append(x.point.tuple)
         else:
-            # not yet done / postpone one day
+            # not yet done / postpone
             return insert_church_way.apply_async(args=[data], countdown=60,
                                                  retry=True, retry_policy={
                     'max_retries': 10,
@@ -79,7 +79,6 @@ def insert_church_way(data):
         except:
             # FIXME: should send us a message
             pass
-
     kosm.save()
     return True
 
