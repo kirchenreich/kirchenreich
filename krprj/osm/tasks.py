@@ -151,7 +151,15 @@ class GetRefs(object):
         return self.ref_id_list[self.this_ref_index][0]
 
     def update_ref(self, osmid, lat, lon):
-        ref_obj = Ref.objects.get(osm_id=osmid)
+        try:
+            ref_obj = Ref.objects.get(osm_id=osmid)
+        except Ref.MultipleObjectsReturned:
+            # if entry is a duplicate delete one of them.
+            # they should be the same.
+            ref_obj = Ref.objects.filter(osm_id=osmid)
+            ref_obj[1].delete()
+            ref_obj = ref_obj[0]
+            
         ref_obj.set_point(lon, lat)
         ref_obj.need_update = False
         ref_obj.save()
