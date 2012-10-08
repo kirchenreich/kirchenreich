@@ -50,7 +50,7 @@ def insert_church_way(data):
             tpl.append(x.point.tuple)
         else:
             # not yet done / postpone one day
-            raise insert_church_way(args=[data], countdown=3600)
+            raise insert_church_way.apply_async(args=[data], countdown=3600)
             # or return False ??
 
     # now add dataset
