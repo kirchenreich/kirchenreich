@@ -153,7 +153,7 @@ def add_churches(filename):
 @task
 def update_refs(filename):
     # get refs
-    refs = GetRefs(opts)
+    refs = GetRefs()
     p = OSMParser(concurrency=4,
                   coords_callback=refs.coords)
     p.parse(filename)
