@@ -46,7 +46,7 @@ def insert_church_way(data):
     ref_tuples = []
     for ref in data.get('refs'):
         x = Ref.objects.filter(osm_id=ref)
-        if x and not x.need_update:
+        if len(x)>0 and not x[0].need_update:
             tpl.append(x.point.tuple)
         else:
             # not yet done / postpone one day
