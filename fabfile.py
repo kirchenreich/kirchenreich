@@ -1,4 +1,5 @@
 import os
+import time
 
 from fabric.api import task, env, sudo, cd, prefix
 from fabric.utils import puts
@@ -78,7 +79,9 @@ def restart_celery():
     """Restart the celery worker"""
     puts(yellow("Restart celery worker"))
     with prefix('source %s' % in_rwd('bin/activate')):
-        sudo('supervisorctl restart celery', user=env.app_user)
+        sudo('supervisorctl restart celery-worker', user=env.app_user)
+        time.sleep(1)
+        sudo('supervisorctl status', user=env.app_user)
 
 
 @task
