@@ -50,8 +50,7 @@ def insert_church_way(data):
             tpl.append(x.point.tuple)
         else:
             # not yet done / postpone one day
-            raise insert_church_way.apply_async(args=[data], countdown=3600)
-            # or return False ??
+            return insert_church_way.apply_async(args=[data], countdown=3600)
 
     # now add dataset
     kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
