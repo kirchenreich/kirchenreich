@@ -47,7 +47,7 @@ def insert_church_way(data):
     for ref in data.get('refs'):
         x = Ref.objects.get(osm_id=ref)
         if x and not x.need_update:
-            tpl.append(x.point.tuple)
+            ref_tuples.append(x.point.tuple)
         else:
             # not yet done / postpone one day
             return insert_church_way.apply_async(args=[data], countdown=60,
@@ -68,13 +68,13 @@ def insert_church_way(data):
     kosm.osm_type = 'W'
 
     try:
-        kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
+        kosm.mpoly = MultiPolygon(Polygon(tuple(ref_tuples)))
         kosm.point = kosm.mpoly.centroid
     except:
         try:
             # add first point at the end to close the ring.
             tpl.append(tpl[0])
-            kosm.mpoly = MultiPolygon(Polygon(tuple(tpl)))
+            kosm.mpoly = MultiPolygon(Polygon(tuple(ref_tuples)))
             kosm.point = kosm.mpoly.centroid
         except:
             # FIXME: should send us a message
