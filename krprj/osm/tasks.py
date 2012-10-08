@@ -127,17 +127,17 @@ class GetRefs(object):
     """ Get all nodes for ways from first run.
 
     This class uses two methods to get all refs.
-    If the length of the list is below 100 it uses the full list.
-    If the length of the list is longer than 100 it iterates over the sorted list.
+    If the length of the list is below 1000 it uses the full list.
+    If the length of the list is longer than 1000 it iterates over the sorted list.
     This is important because in the openstreetmap planet we need to find over
     one million refs.
     """
 
-    def __init__(self):
+    def __init__(self, threshold=1000):
         self.ref_id_list = Ref.objects.filter(
             need_update=True).order_by('osm_id').values_list('osm_id')
         self.use_full_list = False
-        if len(self.ref_id_list) < 100:
+        if len(self.ref_id_list) < threshold:
             self.use_full_list = True
             self.this_values = map(lambda x:x[0], self.ref_id_list)
         else:
