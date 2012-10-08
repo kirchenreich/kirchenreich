@@ -49,6 +49,15 @@ def insert_church_way(data):
             x = Ref.objects.get(osm_id=ref)
         except Ref.DoesNotExist:
             x = None
+        except Ref.MultipleObjectsReturned:
+            x = Ref.objects.filter(osm_id=ref)
+            if not x[0].need_update:
+                x[1].delete()
+                x = x[0]
+            else:
+                x[0].delete()
+                x = x[1]
+            
         if x and not x.need_update:
             ref_tuples.append(x.point.tuple)
         else:
