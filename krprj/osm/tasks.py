@@ -128,18 +128,23 @@ class GetRefs(object):
     """
 
     def __init__(self):
-        self.ref_id_list = Ref.objects.filter(need_update=True)
+        self.ref_id_list = Ref.objects.filter(need_update=True).order_by('osm_id')
+        self.ref_list_len = len(self.ref_id_list)
+        self.this_ref_index = 0
 
     def coords(self, coords):
         """ save all coords to corresponding ref dataset
         """
         for osmid, lon, lat in coords:
-            if osmid in self.ref_id_list:
+            if osmid == self.ref_id_list[self.this_ref_index]:
                 ref_obj = Ref.objects.get(osm_id=osmid)
                 ref_obj.set_point(lon, lat)
                 ref_obj.need_update = False
                 ref_obj.save()
-                self.ref_id_list.remove(osmid)
+            if osmid >= self.ref_id_list[self.this_ref_index]:
+                self.this_ref_index += 1
+                if self.this_ref_index >= self.ref_list_len:
+                    break
 
 ################################################################################
 
