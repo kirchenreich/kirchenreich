@@ -45,12 +45,18 @@ def insert_church_way(data):
     # are all refs in database?
     ref_tuples = []
     for ref in data.get('refs'):
-        x = Ref.objects.filter(osm_id=ref)
-        if len(x)>0 and not x[0].need_update:
+        x = Ref.objects.get(osm_id=ref)
+        if x and not x.need_update:
             tpl.append(x.point.tuple)
         else:
             # not yet done / postpone one day
-            return insert_church_way.apply_async(args=[data], countdown=3600)
+            return insert_church_way.apply_async(args=[data], countdown=60,
+                                                 retry=True, retry_policy={
+                    'max_retries': 10,
+                    'interval_start': 0,
+                    'interval_step': 30,
+                    'interval_max': 60,
+                    })
 
     # now add dataset
     kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
@@ -113,8 +119,8 @@ class GetChurches(object):
                 d = {'id': osmid, 'tags': tags, 'refs': refs}
                 ## add task to celery -- add refs needed for ways
                 insert_refs_needed.apply_async(args=[refs])
-                ## add task to celery -- insert way / execute later (1h)
-                insert_church_way.apply_async(args=[d], countdown=3600)
+                ## add task to celery -- insert way / execute later (1min)
+                insert_church_way.apply_async(args=[d], countdown=60)
 
 
 class GetRefs(object):
@@ -131,7 +137,7 @@ class GetRefs(object):
             if osmid in self.ref_id_list:
                 ref_obj = Ref.objects.get(osm_id=osmid)
                 ref_obj.set_point(lon, lat)
-                ref_obj.need_update=False
+                ref_obj.need_update = False
                 ref_obj.save()
                 self.ref_id_list.remove(osmid)
 
