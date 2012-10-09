@@ -123,9 +123,10 @@ class GetChurches(object):
             if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
                 d = {'id': osmid, 'tags': tags, 'refs': refs}
                 ## add task to celery -- add refs needed for ways
-                insert_refs_needed.apply_async(args=[refs])
-                ## add task to celery -- insert way / execute later (1min)
-                insert_church_way.apply_async(args=[d], countdown=60)
+                insert_refs_needed.apply_async(args=[refs], priority=1)
+                ## add task to celery -- insert way / execute later (10min)
+                insert_church_way.apply_async(args=[d], countdown=600,
+                                              priority=8)
 
 
 class GetRefs(object):
