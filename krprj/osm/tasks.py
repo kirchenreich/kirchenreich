@@ -62,13 +62,7 @@ def insert_church_way(data):
             ref_tuples.append(x.point.tuple)
         else:
             # not yet done / postpone
-            return insert_church_way.apply_async(args=[data], countdown=60,
-                                                 retry=True, retry_policy={
-                    'max_retries': 10,
-                    'interval_start': 0,
-                    'interval_step': 30,
-                    'interval_max': 60,
-                    })
+            return current.retry(args=[data], countdown=600)
 
     # now add dataset
     kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
