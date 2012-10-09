@@ -17,10 +17,8 @@ class KircheOsm(models.Model):
                                 default='')
 
     name = models.TextField(blank=True, null=True, default=None)
-    religion = models.CharField(max_length=200,
-                                blank=True, null=True, default=None)
-    denomination = models.CharField(max_length=200,
-                                    blank=True, null=True, default=None)
+    religion = models.TextField(blank=True, null=True, default=None)
+    denomination = models.TextField(blank=True, null=True, default=None)
     # for now; later using hstore or extra table.
     addional_fields = models.TextField(blank=True, null=True,
                                        default=None)
