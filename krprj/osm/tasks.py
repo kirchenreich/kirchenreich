@@ -1,4 +1,4 @@
-from celery import task
+from celery import task, current_task
 from imposm.parser import OSMParser
 import json
 import os.path
@@ -62,7 +62,7 @@ def insert_church_way(data):
             ref_tuples.append(x.point.tuple)
         else:
             # not yet done / postpone
-            return current.retry(args=[data], countdown=600)
+            return current_task.retry(args=[data], countdown=600)
 
     # now add dataset
     kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
@@ -209,7 +209,7 @@ def update_refs(filename):
     p.parse(filename)
 
     if len(Ref.objects.filter(need_update=True))>0:
-        current.retry(args=[filename])
+        current_task.retry(args=[filename])
 
     return True
 
