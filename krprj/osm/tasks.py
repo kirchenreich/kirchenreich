@@ -209,7 +209,7 @@ def update_refs(filename):
     p.parse(filename)
 
     if len(Ref.objects.filter(need_update=True))>0:
-        update_refs.apply_async(args=[filename])
+        current.retry(args=[filename])
 
     return True
 
