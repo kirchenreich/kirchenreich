@@ -59,11 +59,28 @@ img {
             </table>
             <div class="tabbable">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#osm" data-toggle="tab">OpenStreetMap</a></li>
-                    <li><a href="#wikipedia" data-toggle="tab">Wikipedia</a></li>
+                    <li class="active"><a href="#links" data-toggle="tab">Links</a></li>
+                    <li><a href="#osm" data-toggle="tab">OpenStreetMap</a></li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane active" id="osm">
+                    <div class="tab-pane active" id="links">
+                        <h3>Openstreetmap reference</h3>
+                        <ul>
+                            <li><a href="{{ object.osm_url }}">Details on this {{ object.get_osm_type_display }}</a></li>
+                        </ul>
+
+                        {% if wikipedia_pages|length > 0 %}
+                        <h3>Wikipedia Article{{ wikipedia_pages|length|pluralize }}</h3>
+                        <ul>
+                            {% for wikipedia_page in wikipedia_pages %}
+                            <li><a href="{{ wikipedia_page.url }}">{{ wikipedia_page }}</a></li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="alert alert-info">This place <strong>isn't</strong> connected with a wikipedia article.</div>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane" id="osm">
                         {% if addional_fields|length > 0 %}
                         <table class="table table-bordered">
                             <tbody>
@@ -77,18 +94,6 @@ img {
                         </table>
                         {% else %}
                         <div class="alert alert-info">There are no addional information from OpenStreetMap</div>
-                        {% endif %}
-                    </div>
-                    <div class="tab-pane" id="wikipedia">
-                        {% if wikipedia_pages|length > 0 %}
-                        <h3>Wikipedia Article{{ wikipedia_pages|length|pluralize }}</h3>
-                        <ul>
-                            {% for wikipedia_page in wikipedia_pages %}
-                            <li><a href="{{ wikipedia_page.url }}">{{ wikipedia_page }}</a></li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        <div class="alert alert-info">This place <strong>isn't</strong> connected with a wikipedia article.</div>
                         {% endif %}
                     </div>
                 </div>
