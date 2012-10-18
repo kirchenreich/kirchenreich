@@ -56,7 +56,7 @@ def insert_church_way(data):
                 x = x[0]
             else:
                 x[0].delete()
-                x = x[1]
+                x = x[0]
             
         if x and not x.need_update:
             ref_tuples.append(x.point.tuple)
