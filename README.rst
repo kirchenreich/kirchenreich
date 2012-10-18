@@ -79,3 +79,23 @@ Run locally
 
 
 * ./manage.py runserver
+
+
+Deploy on kirchereich.org
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* you need system user with sudo right on the server
+
+List of available commands:
+
+::
+
+  fab -l
+
+Run deployment on server:
+
+::
+
+  fab deploy -u <your system user>
+
+Notice you must specific your server user name with the -u flag.
