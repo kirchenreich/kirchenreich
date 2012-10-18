@@ -63,24 +63,23 @@ def insert_church_way(data):
     # now add dataset
     kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
 
-    kosm.lon = data['refs'][0]
-    kosm.lat = data['refs'][1]
-
     kosm = set_tags(kosm, data.get('tags'))
     kosm.osm_type = 'W'
 
     try:
         kosm.mpoly = MultiPolygon(Polygon(tuple(ref_tuples)))
         kosm.point = kosm.mpoly.centroid
+        kosm.lon, kosm.lat = kosm.point.tuple
     except:
         try:
             # add first point at the end to close the ring.
             tpl.append(tpl[0])
             kosm.mpoly = MultiPolygon(Polygon(tuple(ref_tuples)))
             kosm.point = kosm.mpoly.centroid
+            kosm.lon, kosm.lat = kosm.point.tuple
         except:
-            # FIXME: should send us a message
-            pass
+            kosm.lon, kosm.lat = ref_tuples[0]
+            kosm.set_geo()
     kosm.save()
     return True
 
