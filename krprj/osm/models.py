@@ -14,7 +14,7 @@ class KircheOsm(models.Model):
             ('W','way'),
             )
     osm_type = models.CharField(max_length=5, choices = TYPE_CHOICES,
-                                default='')
+                                default='', db_index=True)
 
     name = models.TextField(blank=True, null=True, default=None)
     religion = models.TextField(blank=True, null=True, default=None)
