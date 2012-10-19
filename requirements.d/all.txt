@@ -1,6 +1,7 @@
 Django==1.4.2
 psycopg2
 South==0.7.6
+django-celery==3.0.11
 django-celery-with-redis
 imposm.parser
 pytz
