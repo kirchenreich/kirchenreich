@@ -64,10 +64,14 @@ img {
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="links">
+		        {% if object.osm_url|length > 0 %}
                         <h3>Openstreetmap reference</h3>
                         <ul>
                             <li><a href="{{ object.osm_url }}">Details on this {{ object.get_osm_type_display }}</a></li>
                         </ul>
+                        {% else %}
+                        <div class="alert alert-info">This place has <strong>no</strong> correct connection to Openstreetmap.</div>
+                        {% endif %}
 
                         {% if wikipedia_pages|length > 0 %}
                         <h3>Wikipedia Article{{ wikipedia_pages|length|pluralize }}</h3>
