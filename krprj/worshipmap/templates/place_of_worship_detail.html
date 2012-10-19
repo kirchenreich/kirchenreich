@@ -73,6 +73,15 @@ img {
                         <div class="alert alert-info">This place has <strong>no</strong> correct connection to Openstreetmap.</div>
                         {% endif %}
 
+			{% if object.unite %}
+			<h3>Country</h3>
+			<ul>
+                            <li>This place of worship is in {{ object.unite.country.name }}</li>
+			</ul>
+                        {% else %}
+                        <div class="alert alert-info">This place <strong>isn't</strong> connected to a country.</div>
+                        {% endif %}
+
                         {% if wikipedia_pages|length > 0 %}
                         <h3>Wikipedia Article{{ wikipedia_pages|length|pluralize }}</h3>
                         <ul>
