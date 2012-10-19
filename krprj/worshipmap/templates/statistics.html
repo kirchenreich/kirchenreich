@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block load_css %}
+{{ block.super }}
+<style>
+img {
+    max-width: none; /* Fix twitter bootstrap to work together with OpenLayers */
+}
+</style>
+{% endblock %}
+
+{% block load_js %}
+{{ block.super }}
+<script type="text/javascript" src="{{ STATIC_URL }}openlayers/OpenLayers.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/worshipmap.js"></script>
+{% endblock %}
+
+{% block run_js %}
+{{ block.super }}
+<script type="text/javascript">
+    $(document).ready(function(){
+        var center = [{{ point_for_openlayers.x }}, {{ point_for_openlayers.y }}];
+        kr.buildMap('map', center, 15, false);
+        kr.refresh_markers();
+        if (sessionStorage){
+            kr.session.set_possition(kr.map.getCenter())
+            kr.session.set_zoom(13)
+        }
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>{{ object.name|default_if_none:"<em>unknown</em>"|safe }}</h1>
+    </div>
+    <div class="row">
+        <div class="span6">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>References need update</td>
+                        <td>{{ ref_need_update }} / {{ ref_count }}</td>
+                    </tr>
+                    <tr>
+                        <td>osm_types</td>
+                        <td><table class="table table-striped">
+			  {% for key, value in osm_type.iteritems %}
+			    <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+			    {% endfor %}
+			    </table>
+			</td>
+                    </tr>
+                    <tr>
+                        <td>Last update of OSM datasets</td>
+                        <td><table class="table table-striped">
+			    <tr><td>More than one week ago</td><td>{{ older_than_1week }}</td></tr>
+			    <tr><td>More than two weeks ago</td><td>{{ older_than_2weeks }}</td></tr>
+			    <tr><td>More than three weeks ago</td><td>{{ older_than_3weeks }}</td></tr>
+			  </table>
+			</td>
+                    </tr>
+		</tbody>
+	    </table>
+        </div>
+        <div class="span6" style="height: 80%"><div></div></div>
+    </div>
+
+</div>
+{% endblock %}
