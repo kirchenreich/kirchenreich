@@ -89,7 +89,13 @@ def insert_refs_needed(refs):
     """ Insert alls refs needed to create the ways for polygon-based churches.
     """
     for ref_id in refs:
-        ref, created = Ref.objects.get_or_create(osm_id=ref_id)
+        try:
+            ref, created = Ref.objects.get_or_create(osm_id=ref_id)
+        except Ref.MultipleObjectsReturned:
+            created = False
+            ref = Ref.objects.filter(osm_id=ref_id)
+            ref[1].delete()
+            ref = ref[0]
         if not created:
             ref.need_update = True
         ref.save()
