@@ -75,6 +75,9 @@ class StatisticsView(TemplateView):
         context['osm_type'] = data
 
         # date
+        context['last_7days'] = KircheOsm.objects.filter(last_update__gt=(
+                datetime.datetime.utcnow().replace(tzinfo=utc) -
+                datetime.timedelta(days=7))).count()
         context['older_than_1week'] = KircheOsm.objects.filter(last_update__lt=(
                 datetime.datetime.utcnow().replace(tzinfo=utc) -
                 datetime.timedelta(days=7))).count()
