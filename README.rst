@@ -98,4 +98,4 @@ Run deployment on server:
 
   fab deploy -u <your system user>
 
-Notice you must specific your server user name with the -u flag.
+Notice that you may have to specify your server user name with the -u flag.
