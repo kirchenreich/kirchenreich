@@ -210,7 +210,7 @@ def update_refs(filename):
     p.parse(filename)
 
     if len(Ref.objects.filter(need_update=True))>0:
-        current_task.retry()
+        return current_task.retry()
 
     return True
 
