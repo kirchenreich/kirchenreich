@@ -37,7 +37,7 @@ def insert_church_node(data):
     return True
 
 
-@task(default_retry_delay=10*60, max_retries=20)
+@task(default_retry_delay=10*60, max_retries=40)
 def insert_church_way(data):
     """ Insert church based on way(s).
     Needs references to points for creating the way(s)
