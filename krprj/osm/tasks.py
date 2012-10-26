@@ -197,11 +197,12 @@ def add_churches(filename):
                   ways_callback=churches.ways)
     p.parse(filename)
     
-    update_refs.apply_async(args=[filename])
+    # don't run as task anymore:
+    update_refs(filename)
     return True
 
 
-@task(max_retries=50)
+#@task(max_retries=50)
 def update_refs(filename):
     # get refs
     refs = GetRefs()
@@ -210,7 +211,7 @@ def update_refs(filename):
     p.parse(filename)
 
     if len(Ref.objects.filter(need_update=True))>0:
-        return current_task.retry()
+        return update_refs(filename)
 
     return True
 
