@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block load_css %}
+{{ block.super }}
+<style>
+img {
+    max-width: none; /* Fix twitter bootstrap to work together with OpenLayers */
+}
+
+#fourOhfour {
+ background-position:center;
+ background-image:url({{ STATIC_URL }}images/404.jpg);
+}
+</style>
+{% endblock %}
+
+{% block load_js %}
+{{ block.super }}
+<script type="text/javascript" src="{{ STATIC_URL }}openlayers/OpenLayers.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/worshipmap.js"></script>
+{% endblock %}
+
+{% load humanize %}
+{% block nav_right %}
+<li><a href="#" id="osm_count"><span class="label label-info">OpenStreetMap {{ osm_places_count|intcomma }} places</span></a></li>
+<li><a href="#" id="wikipedia_count"><span class="label label-info">Wikipedia {{ wikipedia_places_count|intcomma }} places</span></a></li>
+<li><a href="#" id="nav_status"></a></li>
+{% endblock %}
+
+
+{% block content %}
+<div id="404" class="fourOhfour"></div>
+{% endblock %}
