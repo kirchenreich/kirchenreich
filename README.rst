@@ -1,7 +1,7 @@
 kirchenreich
 ============
 
-This is a Django Dash 2012 project.
+Place #7 in Django Dash 2012.
 
 
 About
@@ -16,7 +16,7 @@ We want to **encourage** users to fix the problems in Wikipedia and Openstreetma
 Of course this site not only has churches, but all **places of worship**.
 
 We developed this site for the `DjangoDash <http://djangodash.com>`_ **at one weekend**.
-Hopefully we find time to improve the site in the future.
+We will improve this site in the future.
 The whole sourcecode is on `Github <https://github.com/mfa/kirchenreich>`_ under BSD licence.
 
 Feel free to fork the repository, file bugrequests or even send in feature wishes.
@@ -50,7 +50,7 @@ Install How-to
   pip install -r requirements.d/dev-standalone.txt
 
 
- * set in krprj/settings/local.py::
+* set in krprj/settings/local.py::
 
   # SECRET_KEY - see http://www.miniwebtool.com/django-secret-key-generator/
   # DATABASES - see settings.py for template without user/pw
@@ -70,9 +70,32 @@ Run locally
   unzip TM_WORLD_BORDERS-0.3.zip
   rm TM_WORLD_BORDERS-0.3.zip
 
-* import worlddata (in django shell)::
+* import worlddata (in django shell):
+
+::
 
   from world import load
   load.run()
 
+
 * ./manage.py runserver
+
+
+Deploy on kirchereich.org
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* you need system user with sudo right on the server
+
+List of available commands:
+
+::
+
+  fab -l
+
+Run deployment on server:
+
+::
+
+  fab deploy -u <your system user>
+
+Notice that you may have to specify your server user name with the -u flag.

@@ -3,6 +3,7 @@ from datetime import datetime
 from django.utils.timezone import utc
 
 from krprj.world.models import WorldBorder
+from krprj.wikipedia.models import KircheWikipedia
 import json
 
 
@@ -21,23 +22,39 @@ class KircheChecks(models.Model):
 
     wikipedia_infobox = models.BooleanField(default=False)
 
-    last_update = models.DateTimeField(default=datetime.utcnow(
-            ).replace(tzinfo=utc))
-    created = models.DateTimeField(default=datetime.utcnow(
-            ).replace(tzinfo=utc))
+    last_update = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return "%d [%s]" % (self.id, self.name or '')
+        return "%d [%s] (%s/%s)" % (self.id, self.kircheunite.name or '',
+                                    self.achieved, self.available)
 
-    def save(self, *args, **kwargs):
-        self.last_update = datetime.utcnow().replace(tzinfo=utc)
-        super(KircheChecks, self).save(*args, **kwargs)
+    @property
+    def available(self):
+        """This property returns the count of available checks."""
+        count = 0
+        for field in self._meta.fields:
+            if isinstance(field, models.BooleanField):
+                count += 1
+        return count
 
-    def sum_checks(self):
-        # FIXME: not count last_update and created!!
-        return sum([field for field in KircheChecks._meta.fields])
+    @property
+    def achieved(self):
+        """Instead to available() this property returns the count of achieved
+        checks by the unite object."""
+        count = 0
+        for field in self._meta.fields:
+            if isinstance(field, models.BooleanField):
+                count += int(getattr(self, field.name))
+        return count
 
-    def run(self):
+    def _run(self):
+        """Don't run this method directly!
+        Use KircheUnite.update_checks() instead.
+
+        Run some quality checks over the osm and wikipedia objects.
+        """
+
         if self.kircheunite:
             for osm in self.kircheunite.kircheosm_set.all():
                 self.osm = True
@@ -59,52 +76,31 @@ class KircheChecks(models.Model):
                 if len(wiki.infobox) > 3:
                     self.wikipedia_infobox = True
 
+            self.save()
+
 
 class KircheUniteManager(models.Manager):
 
-    def correlate_all_osm(self):
-        """ correlate osm datasets with wikipedia datasets
+    def get_by_osm_or_create(self, osm):
+        """Get a KircheUnit object for KircheOsm object. If there no
+        KircheUnite object than it will be create a new one and set name
+        and point in the unite object from the Osm object.
         """
-        from krprj.osm.models import KircheOsm
-        from krprj.wikipedia.models import KircheWikipedia
-        for elem in KircheOsm.objects.all():
-            self.correlate_osm(elem, KircheWikipedia)
 
-    def get_country(self, point):
-        if not point:
-            return None
-        try:
-            return WorldBorder.objects.get(
-                mpoly__intersects=point)
-        except WorldBorder.DoesNotExist:
-            return None
+        unite_objs = self.filter(kircheosm=osm)
+        if unite_objs.count() == 0:
+            unite = self.model()
+            unite.name = osm.name
+            unite.point = osm.point
+            unite.save()
 
-    def get_wikipedia(self, point, KircheWikipedia):
-        # find all wikipedia entries within 100 meters
-        if not point:
-            return []
-        pnts = KircheWikipedia.objects.filter(
-            point__distance_lte=(point, 100))
-        return pnts
+            osm.unite = unite
+            osm.save()
 
-    def correlate_osm(self, elem, KircheWikipedia):
-        if not elem.unite:
-            elem.unite = KircheUnite.objects.create(name=elem.name,
-                                                    point=elem.point)
-        elem.unite.country = self.get_country(elem.point)
-        elem.unite.save()
+            # This is not perfect but it's working
+            return self.filter(kircheosm=osm)
 
-        # commented for later use.
-#        elem.unite.checks = KircheChecks.objects.get_or_create(
-#            kircheunite=elem.unite.id)
-#        elem.unite.checks.run()
-
-        for pnt in self.get_wikipedia(elem.point, KircheWikipedia):
-            elem.unite.kirchewikipedia_set.add(pnt)
-            print elem.unite.kirchewikipedia_set.all()
-
-        elem.unite.save()
-        elem.save()
+        return unite_objs
 
 
 class KircheUnite(models.Model):
@@ -121,13 +117,51 @@ class KircheUnite(models.Model):
 
     checks = models.OneToOneField(KircheChecks, blank=True, null=True)
 
-    last_update = models.DateTimeField(default=datetime.utcnow(
-            ).replace(tzinfo=utc))
-    created = models.DateTimeField(default=datetime.utcnow(
-            ).replace(tzinfo=utc))
+    last_update = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     # manager
     objects = KircheUniteManager()
 
     def __unicode__(self):
         return "%d [%s]" % (self.id, self.name or '')
+
+    def update_wikipedia(self):
+        """Try to find some wikipedia objects within a radius of 100m to the
+        point of the unite object.
+        """
+        if self.point is None:
+            return
+
+        articles = KircheWikipedia.objects.filter(
+            point__distance_lte=(self.point, 100)
+        )
+        self.kirchewikipedia_set.add(*articles)
+        return articles
+
+    def update_country(self):
+        """Take the point of the unite object and update the country into the
+        database and return the result.
+        """
+        if self.point is None:
+            return None
+
+        try:
+            self.country = WorldBorder.objects.get(
+                mpoly__intersects=self.point
+            )
+            self.save()
+            return self.country
+        except WorldBorder.DoesNotExist:
+            return None
+
+    def update_checks(self):
+        """Update/Create the check object and run the available checks"""
+        if self.checks is None:
+            self.checks = KircheChecks()
+            self.checks.save()
+
+            self.checks_id = self.checks.id
+            self.save()
+
+        self.checks._run()

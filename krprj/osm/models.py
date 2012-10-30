@@ -4,7 +4,8 @@ from django.contrib.gis.geos import Point, MultiPolygon, Polygon
 from krprj.krunite.models import KircheUnite
 
 import json
-
+from datetime import datetime
+from django.utils.timezone import utc
 
 class KircheOsm(models.Model):
     osm_id = models.IntegerField(db_index=True)
@@ -13,13 +14,11 @@ class KircheOsm(models.Model):
             ('W','way'),
             )
     osm_type = models.CharField(max_length=5, choices = TYPE_CHOICES,
-                                default='')
+                                default='', db_index=True)
 
     name = models.TextField(blank=True, null=True, default=None)
-    religion = models.CharField(max_length=200,
-                                blank=True, null=True, default=None)
-    denomination = models.CharField(max_length=200,
-                                    blank=True, null=True, default=None)
+    religion = models.TextField(blank=True, null=True, default=None)
+    denomination = models.TextField(blank=True, null=True, default=None)
     # for now; later using hstore or extra table.
     addional_fields = models.TextField(blank=True, null=True,
                                        default=None)
@@ -35,6 +34,9 @@ class KircheOsm(models.Model):
     unite = models.ForeignKey(KircheUnite, blank=True, null=True)
 
     objects = models.GeoManager()
+
+    last_update = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return "%s (%s) [%s]" % (self.id, self.name or '', self.religion or '')
@@ -63,6 +65,13 @@ class KircheOsm(models.Model):
         if changed:
             self.save()
 
+    def osm_url(self):
+        if self.osm_type:
+            base = 'http://www.openstreetmap.org/browse'
+            return "%s/%s/%d" % (base, self.get_osm_type_display(), self.osm_id)
+        else:
+            return ''
+
     def jsonify(self):
         d = {'osm_id': self.osm_id,
              'name': self.name,
@@ -76,3 +85,29 @@ class KircheOsm(models.Model):
              'unite': self.unite
              }
         return json.dumps(d)
+
+
+class Ref(models.Model):
+    """ table for caching references needed for ways
+    """
+    osm_id = models.IntegerField(db_index=True)
+    point = models.PointField(blank=True, null=True)
+
+    need_update = models.BooleanField(default=True)
+
+    last_update = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return "%s (%s)" % (self.id, self.osm_id)
+
+    def set_point(self, lon=None, lat=None):
+        """ set point if necessary.
+        """
+        changed = False
+        if not self.point and lon and lat:
+            self.point = Point(lon, lat)
+            changed = True
+        if changed:
+            self.save()
+        return changed
