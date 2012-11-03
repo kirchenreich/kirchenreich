@@ -37,7 +37,7 @@ def insert_church_node(data):
     return True
 
 
-@task(default_retry_delay=10*60, max_retries=40)
+@task(default_retry_delay=10*60, max_retries=100)
 def insert_church_way(data):
     """ Insert church based on way(s).
     Needs references to points for creating the way(s)
@@ -124,8 +124,8 @@ class GetChurches(object):
                 d = {'id': osmid, 'tags': tags, 'refs': refs}
                 ## add refs needed for ways -- sync (wait for completion)
                 insert_refs_needed(refs)
-                ## add task to celery -- insert way / execute later (10min)
-                insert_church_way.apply_async(args=[d], countdown=600,
+                ## add task to celery -- insert way / execute later (1h)
+                insert_church_way.apply_async(args=[d], countdown=3600,
                                               priority=8)
 
 
@@ -197,8 +197,8 @@ def add_churches(filename):
     p.parse(filename)
 
     # don't run as task anymore:
-    return update_refs(filename)
-#    return True
+#    return update_refs(filename)
+    return True
 
 
 def update_refs(filename):
