@@ -38,9 +38,13 @@ class PlacesResource(View):
             return JSONResponse(message="missing search area", _code=422)
 
         # Get cordinates for bbox from get parameter
-        p1x, p1y, p2x, p2y = (
-            float(n) for n in request.GET.get('in_bbox').split(',')
-        )
+        try:
+            p1x, p1y, p2x, p2y = (
+                float(n) for n in request.GET.get('in_bbox').split(',')
+                )
+        except ValueError:
+            return JSONResponse(message="wrong data in parameter in_bbox", 
+                                _code=422)
         # Create min and max points with cordinates in EPSG:900913 for bbox
         p1 = Point(p1x, p1y, srid=3857)
         p2 = Point(p2x, p2y, srid=3857)
