@@ -53,7 +53,7 @@ def insert_church_way(data):
             x = Ref.objects.filter(osm_id=ref)
             x[1].delete()
             x = x[0]
-            
+
         if x and not x.need_update:
             ref_tuples.append(x.point.tuple)
         else:
@@ -108,7 +108,7 @@ class GetChurches(object):
     """
 
     def nodes(self, nodes):
-        """ create for every place_of_worship node a task 
+        """ create for every place_of_worship node a task
         """
         for osmid, tags, refs in nodes:
             if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
@@ -117,7 +117,7 @@ class GetChurches(object):
                 insert_church_node.apply_async(args=[d])
 
     def ways(self, ways):
-        """ create for every place_of_worship way a task 
+        """ create for every place_of_worship way a task
         """
         for osmid, tags, refs in ways:
             if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
@@ -163,7 +163,7 @@ class GetRefs(object):
             ref_obj = Ref.objects.filter(osm_id=osmid)
             ref_obj[1].delete()
             ref_obj = ref_obj[0]
-            
+
         ref_obj.set_point(lon, lat)
         ref_obj.need_update = False
         ref_obj.save()
@@ -195,13 +195,12 @@ def add_churches(filename):
                   nodes_callback=churches.nodes,
                   ways_callback=churches.ways)
     p.parse(filename)
-    
+
     # don't run as task anymore:
-    update_refs(filename)
-    return True
+    return update_refs(filename)
+#    return True
 
 
-#@task(max_retries=50)
 def update_refs(filename):
     # get refs
     refs = GetRefs()
