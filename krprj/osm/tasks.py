@@ -84,7 +84,6 @@ def insert_church_way(data):
     return True
 
 
-@task
 def insert_refs_needed(refs):
     """ Insert alls refs needed to create the ways for polygon-based churches.
     """
@@ -123,8 +122,8 @@ class GetChurches(object):
         for osmid, tags, refs in ways:
             if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
                 d = {'id': osmid, 'tags': tags, 'refs': refs}
-                ## add task to celery -- add refs needed for ways
-                insert_refs_needed.apply_async(args=[refs], priority=1)
+                ## add refs needed for ways -- sync (wait for completion)
+                insert_refs_needed(refs)
                 ## add task to celery -- insert way / execute later (10min)
                 insert_church_way.apply_async(args=[d], countdown=600,
                                               priority=8)
@@ -214,8 +213,3 @@ def update_refs(filename):
         return update_refs(filename)
 
     return True
-
-
-# run it:
-#import krprj.osm.tasks as t
-#t.add_churches("/srv/spielwiese/stuttgart-regbez.osm")
