@@ -124,8 +124,8 @@ class GetChurches(object):
                 d = {'id': osmid, 'tags': tags, 'refs': refs}
                 ## add refs needed for ways -- sync (wait for completion)
                 insert_refs_needed(refs)
-                ## add task to celery -- insert way / execute later (1h)
-                insert_church_way.apply_async(args=[d], countdown=3600,
+                ## add task to celery -- insert way / execute later (3h)
+                insert_church_way.apply_async(args=[d], countdown=10800,
                                               priority=8)
 
 
@@ -133,13 +133,13 @@ class GetRefs(object):
     """ Get all nodes for ways from first run.
 
     This class uses two methods to get all refs.
-    If the length of the list is below 10000 it uses the full list.
-    If the length of the list is longer than 10000 it iterates over the sorted list.
+    If the length of the list is below 5000 it uses the full list.
+    If the length of the list is longer than 5000 it iterates over the sorted list.
     This is important because in the openstreetmap planet we need to find over
     one million refs.
     """
 
-    def __init__(self, threshold=10000):
+    def __init__(self, threshold=5000):
         self.ref_id_list = Ref.objects.filter(
             need_update=True).order_by('osm_id').values_list('osm_id')
         self.use_full_list = False
