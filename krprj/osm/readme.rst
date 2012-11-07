@@ -41,7 +41,7 @@ Importing
 
 ::
 
-  # activate virtualenv
+  # activate virtualenv (with virtualenvwrapper)
   workon kr
   cd ~/kirchenreich
   # run shell

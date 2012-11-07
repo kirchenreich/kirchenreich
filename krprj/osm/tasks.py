@@ -133,19 +133,19 @@ class GetRefs(object):
     """ Get all nodes for ways from first run.
 
     This class uses two methods to get all refs.
-    If the length of the list is below 5000 it uses the full list.
-    If the length of the list is longer than 5000 it iterates over the sorted list.
-    This is important because in the openstreetmap planet we need to find over
-    one million refs.
+    If the length of the list is below 1000 it uses the full list.
+    If the length of the list is longer than 1000 it iterates over the sorted
+    list. This is important because in the openstreetmap planet we need to find
+    over one million refs.
     """
 
-    def __init__(self, threshold=5000):
+    def __init__(self, threshold=1000):
         self.ref_id_list = Ref.objects.filter(
             need_update=True).order_by('osm_id').values_list('osm_id')
         self.use_full_list = False
         if len(self.ref_id_list) < threshold:
             self.use_full_list = True
-            self.this_values = map(lambda x:x[0], self.ref_id_list)
+            self.this_values = set(map(lambda x:x[0], self.ref_id_list))
         else:
             self.ref_list_len = len(self.ref_id_list)
             self.this_ref_index = 0
@@ -197,18 +197,21 @@ def add_churches(filename):
     p.parse(filename)
 
     # don't run as task anymore:
-#    return update_refs(filename)
+#    update_refs(filename)
     return True
 
 
 def update_refs(filename):
     # get refs
-    refs = GetRefs()
-    p = OSMParser(concurrency=4,
-                  coords_callback=refs.coords)
-    p.parse(filename)
+    missing_refs = Ref.objects.filter(need_update=True).count()
+    while missing_refs>0:
+        refs = GetRefs()
+        p = OSMParser(concurrency=4,
+                      coords_callback=refs.coords)
+        p.parse(filename)
 
-    if len(Ref.objects.filter(need_update=True))>0:
-        return update_refs(filename)
+        missing_refs_neu = Ref.objects.filter(need_update=True).count()
+        if missing_refs_neu == missing_refs:
+            return False
 
     return True
