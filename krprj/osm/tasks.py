@@ -107,6 +107,10 @@ class GetChurches(object):
     """ collect all nodes and ways with amenity="place_of_worship"
     """
 
+    def __init__(self, invalidate_refs=True):
+        self.invalidate_refs = invalidate_refs
+
+
     def nodes(self, nodes):
         """ create for every place_of_worship node a task
         """
@@ -123,7 +127,8 @@ class GetChurches(object):
             if 'amenity' in tags and tags.get('amenity') == 'place_of_worship':
                 d = {'id': osmid, 'tags': tags, 'refs': refs}
                 ## add refs needed for ways -- sync (wait for completion)
-                insert_refs_needed(refs)
+                if self.invalidate_refs:
+                    insert_refs_needed(refs)
                 ## add task to celery -- insert way / execute later (3h)
                 insert_church_way.apply_async(args=[d], countdown=10800,
                                               priority=8)
@@ -188,9 +193,9 @@ class GetRefs(object):
 ################################################################################
 
 @task
-def add_churches(filename):
+def add_churches(filename, invalidate_refs=True):
     # get churches
-    churches = GetChurches()
+    churches = GetChurches(invalidate_refs=invalidate_refs)
     p = OSMParser(concurrency=4,
                   nodes_callback=churches.nodes,
                   ways_callback=churches.ways)
