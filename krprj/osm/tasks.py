@@ -3,6 +3,7 @@ from imposm.parser import OSMParser
 import json
 import os.path
 import sys
+import random
 
 from .models import KircheOsm, Ref
 
@@ -129,8 +130,10 @@ class GetChurches(object):
                 ## add refs needed for ways -- sync (wait for completion)
                 if self.invalidate_refs:
                     insert_refs_needed(refs)
-                ## add task to celery -- insert way / execute later (3h)
-                insert_church_way.apply_async(args=[d], countdown=10800,
+                ## add task to celery -- insert way / execute later (2h + x)
+                insert_church_way.apply_async(args=[d],
+                                              countdown=7200 +
+                                              random.randint(1,3600),
                                               priority=8)
 
 
