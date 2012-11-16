@@ -22,14 +22,10 @@ The whole sourcecode is on `Github <https://github.com/mfa/kirchenreich>`_ under
 Feel free to fork the repository, file bugrequests or even send in feature wishes.
 
 
-Demo / Live site
-----------------
+Live site
+---------
 
 Production site is http://kirchenreich.org/.
-
-A development version with a lot less data is running
-on `Gondor <http://gondor.io>`_ at http://dev.kirchenreich.org.
-
 
 
 Developer information
@@ -60,6 +56,7 @@ Run locally
 ~~~~~~~~~~~
 
 * you need postgresql with postgis support!
+* for some stuff you may need redis and celery.
 * download world to world/data/:
 
 ::
