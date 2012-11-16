@@ -4,6 +4,8 @@ import json
 import os.path
 import sys
 import random
+import datetime
+from django.utils.timezone import utc
 
 from .models import KircheOsm, Ref
 
@@ -223,3 +225,18 @@ def update_refs(filename):
             return False
 
     return True
+
+
+def cleanup(num_of_days=None):
+    """ delete all osm objects that are older than number_of_days.
+    """
+
+    if not num_of_days:
+        raise ValueError, 'Please give number of days '
+    'the church should be last updated'
+
+    elements = KircheOsm.objects.filter(last_update__lt=(
+            datetime.datetime.utcnow().replace(tzinfo=utc) -
+            datetime.timedelta(days=num_of_days)))
+    for elem in elements:
+        elem.delete()
