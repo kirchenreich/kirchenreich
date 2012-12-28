@@ -36,6 +36,13 @@ http://wiki.openstreetmap.org/wiki/Osmfilter
   ./osmfilter planet-latest.o5m --keep="amenity=place_of_worship" --drop-author -o=planet-latest-pow.osm
 
 
+Get only the nodes from the planet
+
+::
+
+  ./osmfilter planet-latest.o5m --drop-ways --drop-relations --drop-author -o=planet-latest-nodes.osm
+
+
 Importing
 ---------
 
@@ -53,3 +60,5 @@ Importing
   import krprj.osm.tasks as t
   t.add_churches("/srv/spielwiese/planet-latest-pow.osm")
   t.update_refs("/srv/spielwiese/planet-latest.osm.pbf")
+  # or
+  t.update_refs("/srv/spielwiese/planet-latest-nodes.osm")
