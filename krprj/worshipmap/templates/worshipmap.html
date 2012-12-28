@@ -6,6 +6,14 @@
 img {
     max-width: none; /* Fix twitter bootstrap to work together with OpenLayers */
 }
+.sidebar-nav-fixed {
+    padding: 9px 0;
+    position:fixed;
+    left:50px;
+    top:50px;
+    width:200px;
+    z-index: 9999;
+}
 </style>
 {% endblock %}
 
@@ -26,11 +34,21 @@ img {
             kr.run_geolocate();
         }
 
+        $("a#togglestats").toggle(function(){
+               $("div#stats").fadeOut();
+               $(this).text("Show statistics");
+          }, function(){
+               $("div#stats").fadeIn();
+               $(this).text("Hide statistics");
+          });
     });
 </script>
 {% endblock %}
 
 {% load humanize %}
+{% block nav_left %}
+<li><a href="#" id="togglestats">Hide statistics</a></li>
+{% endblock %}
 {% block nav_right %}
 <li><a href="#" id="osm_count"><span class="label label-info">OpenStreetMap {{ osm_places_count|intcomma }} places</span></a></li>
 <li><a href="#" id="wikipedia_count"><span class="label label-info">Wikipedia {{ wikipedia_places_count|intcomma }} places</span></a></li>
@@ -40,5 +58,12 @@ img {
 
 
 {% block content %}
-<div id="map"></div>
+<div class="content">
+    <div class="well sidebar-nav-fixed" id="stats">
+      <ul class="nav nav-list" id="stats_ul">
+          <li class="nav-header">Statistics</li>
+        </ul>
+      </div><!--/.well -->
+  <div id="map" style="z-index: 0"></div>
+</div>
 {% endblock %}

@@ -6,9 +6,9 @@ from django.http import HttpResponse
 from django.views.generic import View
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geos import Point, Polygon
+import collections
 
 from krprj.osm.models import KircheOsm
-
 
 @login_required()
 def api_status(request):
@@ -70,6 +70,7 @@ class PlacesResource(View):
 
         # Create our json objects of places
         places_of_worship = []
+        stats = collections.defaultdict(lambda: collections.defaultdict(lambda: 0))
         for place in places:
 
             # Use the GeoDjango Point type to transform the cordinations in
@@ -92,8 +93,16 @@ class PlacesResource(View):
             }
             places_of_worship.append(_place)
 
+            # stats
+            religion = place.religion
+            if not religion:
+                religion = 'unknown'
+            stats['religion'][religion] += 1
+
+
         return JSONResponse(
             request_id=request.GET.get('request_id'),
             places_of_worship=places_of_worship,
-            places_of_worship_count=places.count()
+            places_of_worship_count=places.count(),
+            statistics=stats
         )

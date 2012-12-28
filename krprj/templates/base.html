@@ -29,6 +29,8 @@
           <div class="nav-collapse">
             <ul class="nav">
               <li><a data-toggle="modal" href="#about" >About</a></li>
+              {% block nav_left %}
+              {% endblock %}
             </ul>
             <ul class="nav pull-right">
               {% block nav_right %}
