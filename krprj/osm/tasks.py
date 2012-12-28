@@ -63,8 +63,12 @@ def insert_church_way(data):
             # not yet done / postpone
             return current_task.retry(countdown=600)
 
-    # now add dataset
-    kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
+    try:
+        kosm, created = KircheOsm.objects.get_or_create(osm_id=data['id'])
+    except KircheOsm.MultipleObjectsReturned:
+        x = KircheOsm.objects.filter(osm_id=data['id'])
+        x[1].delete()
+        kosm = x[0]
 
     kosm = set_tags(kosm, data.get('tags'))
     kosm.osm_type = 'W'
