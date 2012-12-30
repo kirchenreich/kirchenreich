@@ -48,6 +48,16 @@
     {% block load_js %}
     <script type="text/javascript">var STATIC_URL = {{ STATIC_URL }}</script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.0.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/raven-0.7.1.min.js"></script>
+    <script type="text/javascript">
+    Raven.config({
+      "publicKey": "027612096bae442c8661fca98a84acdf",
+      "servers": ["https://sentry.thelabmill.de/"],
+      "projectId": "8",
+      "logger": "javascript"
+    });
+    window.onerror = Raven.process;
+    </script>
     <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/js/bootstrap.min.js"></script>
     {% endblock %}
 
