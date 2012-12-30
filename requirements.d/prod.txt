@@ -1,5 +1,5 @@
 -r all.txt
 supervisor
 gunicorn
-raven
+raven>=3.0
 celerymon
