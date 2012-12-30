@@ -64,10 +64,11 @@ kr.refresh_markers = function(){
                 kr.markers.addMarker(marker);
             }
             $("#nav_status").html('<span class="label label-success">'+ response.places_of_worship_count + ' places</span>');
-	    var religion = $.map(response.statistics['religion'], 
-				 function(key, value) {
-				     return "<li>" + value + ": <b>" + key + "</b></li>"
-				 });
+            var religion = $.map(response.statistics['religion'],
+                function(key, value) {
+                    return "<li>" + value + ": <b>" + key + "</b></li>";
+                }
+            );
             $("#stats_ul").html('<li class="nav-header">Statistics</li><li class="active"><a href="#"><b>religion</b></a></li>' + religion.join(""));
         }
     }).error(function(){
