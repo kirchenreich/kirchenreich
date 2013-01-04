@@ -8,11 +8,15 @@ img {
 }
 .sidebar-nav-fixed {
     padding: 9px 0;
-    position:fixed;
+    position: absolute;
     left:50px;
-    top:50px;
+    top:10px;
     width:200px;
     z-index: 9999;
+}
+.content {
+    position: relative;
+    z-index: 1;
 }
 </style>
 {% endblock %}
@@ -59,11 +63,11 @@ img {
 
 {% block content %}
 <div class="content">
-    <div class="well sidebar-nav-fixed" id="stats">
-      <ul class="nav nav-list" id="stats_ul">
-          <li class="nav-header">Statistics</li>
-        </ul>
-      </div><!--/.well -->
+  <div class="well sidebar-nav-fixed" id="stats">
+    <ul class="nav nav-list" id="stats_ul">
+      <li class="nav-header">Statistics</li>
+    </ul>
+  </div><!--/.well sidebar-nav-fixed -->
   <div id="map" style="z-index: 0"></div>
 </div>
 {% endblock %}
