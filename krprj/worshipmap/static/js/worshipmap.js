@@ -110,8 +110,13 @@ kr.refresh_markers = function(){
         }
     }).error(function(){
         if (xhr.status == 422) {
-            $("#nav_status").html('<span class="label label-important"><strong>Please zoom in.</strong> There are to many places of worship to display.</span>');
+            $("#nav_status").html('<span class="label label-important"><strong>Please zoom in.</strong> There are to many places to display.</span>');
             kr.markers.clearMarkers();
+            if (kr.statistics.is_visible()){
+                kr.statistics.hide(function(){
+                    $("#stats_ul").html('<li class="nav-header">Statistics</li><li>There are no statistics about your map sector.</li>');
+                });
+            }
         }
     });
 };
