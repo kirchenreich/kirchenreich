@@ -38,13 +38,7 @@ img {
             kr.run_geolocate();
         }
 
-        $("a#togglestats").toggle(function(){
-               $("div#stats").fadeOut();
-               $(this).text("Show statistics");
-          }, function(){
-               $("div#stats").fadeIn();
-               $(this).text("Hide statistics");
-          });
+        $("a#togglestats").on('click', kr.statistics.toggle);
     });
 </script>
 {% endblock %}

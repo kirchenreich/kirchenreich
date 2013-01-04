@@ -1,4 +1,4 @@
-kr = {'request_id': 0};
+kr = {request_id: 0};
 
 kr.session = {};
 
@@ -25,6 +25,32 @@ kr.session.set_zoom = function(zoom){
 
 kr.session.get_zoom = function(){
     return sessionStorage.kr_zoom;
+};
+
+kr.statistics = {};
+kr.statistics.toggle_show = true;
+kr.statistics.is_visible = function(){
+    return $("#stats_ul").is(":visible");
+};
+
+kr.statistics.toggle = function(){
+    if (kr.statistics.is_visible()) {
+        kr.statistics.hide();
+        kr.statistics.toggle_show = false;
+    } else {
+        kr.statistics.show();
+        kr.statistics.toggle_show = true;
+    }
+};
+
+kr.statistics.show = function(callback){
+    $("div#stats").fadeIn(callback);
+    $("a#togglestats").text("Hide statistics");
+};
+
+kr.statistics.hide = function(callback){
+    $("div#stats").fadeOut(callback);
+    $("a#togglestats").text("Show statistics");
 };
 
 kr.refresh_markers = function(){
@@ -64,12 +90,23 @@ kr.refresh_markers = function(){
                 kr.markers.addMarker(marker);
             }
             $("#nav_status").html('<span class="label label-success">'+ response.places_of_worship_count + ' places</span>');
-            var religion = $.map(response.statistics['religion'],
-                function(key, value) {
-                    return "<li>" + value + ": <b>" + key + "</b></li>";
+            if (response.statistics.religion !== undefined) {
+                var religion = $.map(response.statistics.religion,
+                    function(key, value) {
+                        return "<li>" + value + ": <b>" + key + "</b></li>";
+                    }
+                );
+                $("#stats_ul").html('<li class="nav-header">Statistics</li><li class="active"><a href="#"><b>religion</b></a></li>' + religion.join(""));
+                if (!kr.statistics.is_visible() && kr.statistics.toggle_show) {
+                    kr.statistics.show();
                 }
-            );
-            $("#stats_ul").html('<li class="nav-header">Statistics</li><li class="active"><a href="#"><b>religion</b></a></li>' + religion.join(""));
+            } else {
+                if (kr.statistics.is_visible()){
+                    kr.statistics.hide(function(){
+                        $("#stats_ul").html('<li class="nav-header">Statistics</li><li>There are no statistics about your map sector.</li>');
+                    });
+                }
+            }
         }
     }).error(function(){
         if (xhr.status == 422) {
