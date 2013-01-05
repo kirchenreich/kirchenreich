@@ -1,5 +1,9 @@
 kr = {request_id: 0};
 
+kr.on_mobile = function(){
+    return (screen.width <= 480);
+};
+
 kr.session = {};
 
 kr.session.has_zoom = function(){
@@ -56,7 +60,12 @@ kr.statistics.hide = function(callback){
 kr.refresh_markers = function(){
     $("#nav_status").html('<span class="label label-warning">Loading...</span>');
     kr.request_id++;
-    xhr = $.getJSON("/api/v1/places/?epsg=4326&in_bbox=" + kr.map.getBounds().toBBoxString() + "&request_id=" + kr.request_id, function(response, status, xhr){
+
+    var url = "/api/v1/places/?epsg=4326&in_bbox=" + kr.map.getBounds().toBBoxString() + "&request_id=" + kr.request_id;
+    if (kr.on_mobile()){
+        url = url + "&limit=100";
+    }
+    xhr = $.getJSON(url, function(response, status, xhr){
         $("#zoom_in_alert").hide();
         if (response.request_id == kr.request_id) {
             kr.markers.clearLayers();
