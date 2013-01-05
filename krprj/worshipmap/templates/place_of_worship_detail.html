@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block meta %}
+<meta name="description" content="Place of worship {{object.name|default_if_none:'unknow'}} with religion {{object.religion|default_if_none:'unknow'}}">
+<meta name="keywords" content="kirchenreich, place, of, worship, osm, openstreetmap, wikipedia, church, temple">
+{% endblock %}
+
 {% block load_css %}
 {{ block.super }}
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
@@ -35,21 +40,21 @@ img {
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container" itemscope itemtype="http://schema.org/Place">
     <div class="page-header">
-        <h1>{{ object.name|default_if_none:"<em>unknown</em>"|safe }}</h1>
+        <h1 itemprop="name">{{ object.name|default_if_none:"<em>unknown</em>"|safe }}</h1>
     </div>
     <div class="row">
         <div class="span6">
-            <table class="table table-bordered">
+            <table class="table table-bordered" itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
                 <tbody>
                     <tr>
                         <td>Latitude</td>
-                        <td>{{ object.point.x }}</td>
+                        <td>{{ object.point.x }}<meta itemprop="latitude" content="{{ object.point.x }}" /></td>
                     </tr>
                     <tr>
                         <td>Longitude</td>
-                        <td>{{ object.point.y }}</td>
+                        <td>{{ object.point.y }}<meta itemprop="longitude" content="{{ object.point.y }}" /></td>
                     </tr>
                     <tr>
                         <td>Religion</td>
