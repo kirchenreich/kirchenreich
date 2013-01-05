@@ -43,11 +43,11 @@ class PlacesResource(View):
                 float(n) for n in request.GET.get('in_bbox').split(',')
                 )
         except ValueError:
-            return JSONResponse(message="wrong data in parameter in_bbox", 
+            return JSONResponse(message="wrong data in parameter in_bbox",
                                 _code=422)
         # Create min and max points with cordinates in EPSG:900913 for bbox
-        p1 = Point(p1x, p1y, srid=3857)
-        p2 = Point(p2x, p2y, srid=3857)
+        p1 = Point(p1x, p1y, srid=request.GET.get('epsg', 4326))
+        p2 = Point(p2x, p2y, srid=request.GET.get('epsg', 4326))
 
         # Transform EPSG:900913 (from OpenLayers) to EPSG:4326 (WGS64)
         p1.transform(4326)
