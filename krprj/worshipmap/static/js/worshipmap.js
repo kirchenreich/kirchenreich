@@ -57,6 +57,10 @@ kr.statistics.hide = function(callback){
     $("a#togglestats").text("Show statistics");
 };
 
+if (kr.on_mobile()) {
+    kr.statistics.toggle();
+}
+
 kr.refresh_markers = function(){
     $("#nav_status").html('<span class="label label-warning">Loading...</span>');
     kr.request_id++;
@@ -81,8 +85,8 @@ kr.refresh_markers = function(){
 
                 var marker = new L.marker([place.lat, place.lon], {icon: icon});
                 marker.place_id = place.id;
-                marker.place_name = place.name || "unknow";
-                marker.place_religion = place.religion || "unknow";
+                marker.place_name = place.name || "unknown";
+                marker.place_religion = place.religion || "unknown";
 
                 marker.on("click", kr.on_marker_click);
                 marker.on("mouseover", kr.on_marker_mousehover);
