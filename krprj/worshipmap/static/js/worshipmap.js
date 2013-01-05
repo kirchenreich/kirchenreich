@@ -70,17 +70,13 @@ kr.refresh_markers = function(){
                     icon = kr.marker_icons['default'];
                 }
 
-                marker = new L.marker([place.lat, place.lon], {icon: icon, title: "Hello World!"});
+                var marker = new L.marker([place.lat, place.lon], {icon: icon});
                 marker.place_id = place.id;
-
-                /*$(marker._icon).tooltip({
-                   'title': place.name || "unknow" + "(" + place.religion || "unknow" + ")"
-                }); */
+                marker.place_name = place.name || "unknow";
+                marker.place_religion = place.religion || "unknow";
 
                 marker.on("click", kr.on_marker_click);
-                marker.on("mouseover", function(){
-                    alert("Hello");
-                });
+                marker.on("mouseover", kr.on_marker_mousehover);
                 marker.addTo(kr.markers);
             }
             $("#nav_status").html('<span class="label label-success">'+ response.places_of_worship_count + ' places</span>');
@@ -118,6 +114,25 @@ kr.on_marker_click = function(e){
    window.location = "/" + e.target.place_id;
 };
 
+kr.on_marker_mousehover = function(e){
+    var placement = "top";
+    if (e.originalEvent.layerY < 80) {
+        placement = "bottom";
+    }
+    if (e.originalEvent.layerX < 130) {
+        placement = "right";
+    } else if ((kr.map._container.clientWidth - e.originalEvent.layerX) < 130) {
+        placement = "left";
+    }
+    $(e.target._icon).tooltip({
+        animation: false,
+        placement: placement,
+        html: true,
+        title: "<strong>" + e.target.place_name + "</strong><br/>religion: " + e.target.place_religion
+    });
+    $(e.target._icon).tooltip('show');
+};
+
 kr.buildMap = function(target_div, center, zoom, use_session){
     if (use_session) {
         if (kr.session.has_possition()) {
@@ -129,11 +144,11 @@ kr.buildMap = function(target_div, center, zoom, use_session){
     }
 
     var osm_layer = new L.TileLayer(
-        'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'http://{s}.tile.cloudmade.com/3872B775BBB74188AAFBF300F25489EB/997/256/{z}/{x}/{y}.png',
         {
-            minZoom: 8,
+            minZoom: 3,
             maxZoom: 18,
-            attribution: 'Map data © OpenStreetMap contributors'
+            attribution: 'Map data © OpenStreetMap contributors, Imagery © CloudMade'
         }
     );
     kr.map = L.map(target_div, {
