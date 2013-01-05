@@ -1,5 +1,9 @@
 kr = {request_id: 0};
 
+kr.on_mobile = function(){
+    return (screen.width <= 480);
+};
+
 kr.session = {};
 
 kr.session.has_zoom = function(){
@@ -7,15 +11,15 @@ kr.session.has_zoom = function(){
 };
 
 kr.session.has_possition = function(){
-    return sessionStorage && sessionStorage.kr_lon && sessionStorage.kr_lat;
+    return sessionStorage && sessionStorage.kr_lng && sessionStorage.kr_lat;
 };
 
 kr.session.get_possition = function(){
-    return new OpenLayers.LonLat(sessionStorage.kr_lon, sessionStorage.kr_lat);
+    return new L.LatLng(sessionStorage.kr_lat, sessionStorage.kr_lng);
 };
 
 kr.session.set_possition = function(possition){
-    sessionStorage.kr_lon = possition.lon;
+    sessionStorage.kr_lng = possition.lng;
     sessionStorage.kr_lat = possition.lat;
 };
 
@@ -53,41 +57,40 @@ kr.statistics.hide = function(callback){
     $("a#togglestats").text("Show statistics");
 };
 
+if (kr.on_mobile()) {
+    kr.statistics.toggle();
+}
+
 kr.refresh_markers = function(){
     $("#nav_status").html('<span class="label label-warning">Loading...</span>');
     kr.request_id++;
-    xhr = $.getJSON("/api/v1/places/?epsg=3857&in_bbox=" + kr.map.getExtent().toBBOX() + "&request_id=" + kr.request_id, function(response, status, xhr){
+
+    var url = "/api/v1/places/?epsg=4326&in_bbox=" + kr.map.getBounds().toBBoxString() + "&request_id=" + kr.request_id;
+    if (kr.on_mobile()){
+        url = url + "&limit=100";
+    }
+    xhr = $.getJSON(url, function(response, status, xhr){
         $("#zoom_in_alert").hide();
         if (response.request_id == kr.request_id) {
-            kr.markers.clearMarkers();
+            kr.markers.clearLayers();
             for (var i in response.places_of_worship) {
                 place = response.places_of_worship[i];
 
                 var icon;
                 if (place.religion in kr.marker_icons) {
-                    icon = kr.marker_icons[place.religion].clone();
+                    icon = kr.marker_icons[place.religion];
                 } else {
-                    icon = kr.marker_icons['default'].clone();
+                    icon = kr.marker_icons['default'];
                 }
 
-                var marker = new OpenLayers.Marker(new OpenLayers.LonLat(place.lon, place.lat), icon);
+                var marker = new L.marker([place.lat, place.lon], {icon: icon});
                 marker.place_id = place.id;
+                marker.place_name = place.name || "unknown";
+                marker.place_religion = place.religion || "unknown";
 
-                if (place.name === null) {
-                    place.name = "unknown";
-                }
-                if (place.religion === null) {
-                    place.religion = "unknown";
-                }
-                tooltip = OpenLayers.String.format("${name} (${religion})", place);
-
-                $(marker.events.element).tooltip({
-                    'title': tooltip
-                });
-
-                marker.events.register("click", marker, kr.on_marker_click);
-
-                kr.markers.addMarker(marker);
+                marker.on("click", kr.on_marker_click);
+                marker.on("mouseover", kr.on_marker_mousehover);
+                marker.addTo(kr.markers);
             }
             $("#nav_status").html('<span class="label label-success">'+ response.places_of_worship_count + ' places</span>');
             if (response.statistics.religion !== undefined) {
@@ -111,7 +114,7 @@ kr.refresh_markers = function(){
     }).error(function(){
         if (xhr.status == 422) {
             $("#nav_status").html('<span class="label label-important"><strong>Please zoom in.</strong> There are to many places to display.</span>');
-            kr.markers.clearMarkers();
+            kr.markers.clearLayers();
             if (kr.statistics.is_visible()){
                 kr.statistics.hide(function(){
                     $("#stats_ul").html('<li class="nav-header">Statistics</li><li>There are no statistics about your map sector.</li>');
@@ -122,12 +125,30 @@ kr.refresh_markers = function(){
 };
 
 kr.run_geolocate = function(){
-    kr.map_geolocate.activate();
-    kr.map_geolocate.getCurrentLocation();
+    kr.map.locate({setView: true, maxZoom: 16});
 };
 
 kr.on_marker_click = function(e){
-   window.location = "/" + e.object.place_id;
+   window.location = "/" + e.target.place_id;
+};
+
+kr.on_marker_mousehover = function(e){
+    var placement = "top";
+    if (e.originalEvent.layerY < 80) {
+        placement = "bottom";
+    }
+    if (e.originalEvent.layerX < 130) {
+        placement = "right";
+    } else if ((kr.map._container.clientWidth - e.originalEvent.layerX) < 130) {
+        placement = "left";
+    }
+    $(e.target._icon).tooltip({
+        animation: false,
+        placement: placement,
+        html: true,
+        title: "<strong>" + e.target.place_name + "</strong><br/>religion: " + e.target.place_religion
+    });
+    $(e.target._icon).tooltip('show');
 };
 
 kr.buildMap = function(target_div, center, zoom, use_session){
@@ -140,54 +161,64 @@ kr.buildMap = function(target_div, center, zoom, use_session){
         }
     }
 
-    var osm_layer = new OpenLayers.Layer.OSM("OSM Map Layer");
-    kr.map = new OpenLayers.Map({
-        div: target_div,
-        layers: [osm_layer],
-        center: center,
-        zoom: zoom
+    var osm_layer = new L.TileLayer(
+        'http://{s}.tile.cloudmade.com/3872B775BBB74188AAFBF300F25489EB/997/256/{z}/{x}/{y}.png',
+        {
+            minZoom: 3,
+            maxZoom: 18,
+            attribution: 'Map data © OpenStreetMap contributors, Imagery © CloudMade'
+        }
+    );
+    kr.map = L.map(target_div, {
+        csr: L.CRS.EPSG4326
     });
+    kr.map.addLayer(osm_layer);
+    kr.map.setView(center, zoom);
 
     // Base marker layer
-    kr.markers = new OpenLayers.Layer.Markers("Markers");
-    kr.map.addLayer(kr.markers);
+    kr.markers = new L.LayerGroup();
+    kr.markers.addTo(kr.map);
 
     kr.marker_icons = {
-        'default': [STATIC_URL + 'icons/pin.png', new OpenLayers.Size(15, 24)],
-        'christian': [STATIC_URL + 'icons/christianity_church.png', new OpenLayers.Size(24, 25)],
-        'islam': [STATIC_URL + 'icons/islam.png', new OpenLayers.Size(25, 24)],
-        'muslim': [STATIC_URL + 'icons/islam.png', new OpenLayers.Size(25, 24)],
-        'hindu': [STATIC_URL + 'icons/hindu.png', new OpenLayers.Size(24, 24)],
-        'budddhist': [STATIC_URL + 'icons/buddhist.png', new OpenLayers.Size(28, 22)]
+        'default': L.icon({
+            iconUrl: STATIC_URL + 'icons/pin.png',
+            iconSize: [15, 24]
+        }),
+        'christian': L.icon({
+            iconUrl: STATIC_URL + 'icons/christianity_church.png',
+            iconSize: [24, 25]
+        }),
+        'islam': L.icon({
+            iconUrl: STATIC_URL + 'icons/islam.png',
+            iconSize: [25, 24]
+        }),
+        'muslim': L.icon({
+            iconUrl: STATIC_URL + 'icons/islam.png',
+            iconSize: [25, 24]
+        }),
+        'hindu': L.icon({
+            iconUrl: STATIC_URL + 'icons/hindu.png',
+            iconSize: [24, 24]
+        }),
+        'budddhist': L.icon({
+            iconUrl: STATIC_URL + 'icons/buddhist.png',
+            iconSize: [28, 22]
+        })
     };
 
-    for (var name in kr.marker_icons) {
-        var url = kr.marker_icons[name][0];
-        var size = kr.marker_icons[name][1];
-        kr.marker_icons[name] = new OpenLayers.Icon(
-            url,
-            size,
-            new OpenLayers.Pixel(-(size.w/2), -size.h)
-        );
-    }
-
     // Geolocation
-    kr.map_geolocate = new OpenLayers.Control.Geolocate({
-        bind: true
-    });
-    kr.map_geolocate.events.register("locationupdated", kr.map_geolocate, function(e) {
-        kr.map.zoomTo(13);
-    });
+    kr.map.locate();
 
-    kr.map.addControl(kr.map_geolocate);
 
-    kr.map.events.register("moveend", map, function(e){
+    kr.map.on('moveend', function() {
         kr.refresh_markers();
         if (use_session && sessionStorage) {
-            kr.session.set_possition(e.object.getCenter());
-            kr.session.set_zoom(e.object.getZoom());
+            kr.session.set_possition(kr.map.getCenter());
+            kr.session.set_zoom(kr.map.getZoom());
         }
     });
+
+    kr.refresh_markers();
 
     if (use_session && (kr.session.has_possition() || kr.session.has_zoom())) {
         kr.refresh_markers();

@@ -2,6 +2,10 @@
 
 {% block load_css %}
 {{ block.super }}
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+<!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.ie.css" />
+<![endif]-->
 <style>
 img {
     max-width: none; /* Fix twitter bootstrap to work together with OpenLayers */
@@ -11,7 +15,7 @@ img {
 
 {% block load_js %}
 {{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}openlayers/OpenLayers.js"></script>
+<script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/worshipmap.js"></script>
 {% endblock %}
 
@@ -19,7 +23,7 @@ img {
 {{ block.super }}
 <script type="text/javascript">
     $(document).ready(function(){
-        var center = [{{ point_for_openlayers.x }}, {{ point_for_openlayers.y }}];
+        var center = [{{ point_for_openlayers.y }}, {{ point_for_openlayers.x }}];
         kr.buildMap('map', center, 15, false);
         kr.refresh_markers();
         if (sessionStorage){
@@ -113,7 +117,7 @@ img {
                 </div>
             </div>
         </div>
-        <div class="span6" style="height: 80%"><div id="map"></div></div>
+        <div class="span6" id="map" style="height: 500px"></div>
     </div>
 
 </div>

@@ -6,6 +6,8 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
     <style>
       body {
         padding-top: 40px; /* 60px to make the container go all the way to the bottom of the topbar */
@@ -62,6 +64,13 @@
       "logger": "javascript"
     });
     window.onerror = Raven.process;
+
+    // Hide the addressbar on iPhone
+    if (screen.width <= 480) {
+      window.addEventListener("load", function() {
+        setTimeout(function(){window.scrollTo(0, 1);}, 0);
+      });
+    }
     </script>
     <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/js/bootstrap.min.js"></script>
     {% endblock %}

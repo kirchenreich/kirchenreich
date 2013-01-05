@@ -37,10 +37,10 @@ class PlaceOfWorshipDetailView(DetailView):
         context = super(PlaceOfWorshipDetailView, self).get_context_data(
             **kwargs)
 
-        # Need point of place in EPSG:900913 for OpenLayers but don't want to
+        # Need point of place in EPSG:4326 for Leaflet but don't want to
         # change self.object.point
         point = copy(self.object.point)
-        point.transform(3857)
+        point.transform(4326)
         context['point_for_openlayers'] = point
 
         context['addional_fields'] = json.loads(
