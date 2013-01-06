@@ -4,6 +4,16 @@ kr.on_mobile = function(){
     return (screen.width <= 480);
 };
 
+kr.style = {
+    if_missing_red: function(input){
+        if (input === null || input === undefined || input === "unknown"){
+            return '<em style="color: red">unknown</em>';
+        } else {
+            return input;
+        }
+    }
+};
+
 kr.session = {};
 
 kr.session.has_zoom = function(){
@@ -85,8 +95,9 @@ kr.refresh_markers = function(){
 
                 var marker = new L.marker([place.lat, place.lon], {icon: icon});
                 marker.place_id = place.id;
-                marker.place_name = place.name || "unknown";
-                marker.place_religion = place.religion || "unknown";
+                marker.place_name = place.name;
+                marker.place_religion = place.religion;
+                marker.place_denomination = place.denomination;
 
                 marker.on("click", kr.on_marker_click);
                 marker.on("mouseover", kr.on_marker_mousehover);
@@ -137,21 +148,28 @@ kr.on_marker_click = function(e){
 
 kr.on_marker_mousehover = function(e){
     var placement = "top";
-    if (e.originalEvent.layerY < 80) {
+    if (e.originalEvent.layerY < 130) {
         placement = "bottom";
     }
-    if (e.originalEvent.layerX < 130) {
+    if (e.originalEvent.layerX < 150) {
         placement = "right";
-    } else if ((kr.map._container.clientWidth - e.originalEvent.layerX) < 130) {
+    } else if ((kr.map._container.clientWidth - e.originalEvent.layerX) < 150) {
         placement = "left";
     }
-    $(e.target._icon).tooltip({
+
+    var content = "";
+    content += "<p>religion: " + kr.style.if_missing_red(e.target.place_religion) + "<br/>";
+    content += "denomination: " + kr.style.if_missing_red(e.target.place_denomination) + "</p>";
+
+    $(e.target._icon).popover({
         animation: false,
         placement: placement,
+        trigger: 'hover',
         html: true,
-        title: "<strong>" + e.target.place_name + "</strong><br/>religion: " + e.target.place_religion
+        title: "<strong>" + kr.style.if_missing_red(e.target.place_name) + "</strong>",
+        content: content
     });
-    $(e.target._icon).tooltip('show');
+    $(e.target._icon).popover('show');
 };
 
 kr.buildMap = function(target_div, center, zoom, use_session){
