@@ -105,15 +105,30 @@ kr.refresh_markers = function(){
             }
             $("#nav_status").html('<span class="label label-success">'+ response.places_of_worship_count + ' places</span>');
             if (response.statistics.religion !== undefined) {
-                var religion = $.map(response.statistics.religion,
-                    function(count, religion) {
-                        if (religion === "unknown") {
-                            return "<li style='color: red;'><em>" + religion + "</em>: <b>" + count + "</b></li>";
-                        }
-                        return "<li>" + religion + ": <b>" + count + "</b></li>";
+                var religions = [];
+                for (var religion in response.statistics.religion) {
+                    if (response.statistics.religion.hasOwnProperty(religion)) {
+                        religions.push(religion);
                     }
-                );
-                $("#stats_ul").html('<li class="nav-header">Statistics</li><li class="active"><a href="#"><b>religion</b></a></li>' + religion.join(""));
+                }
+                religions.sort();
+                if (religions.indexOf("unknown") !== -1) {
+                    religions.pop("unknown");
+                    religions.push("unknown");
+                }
+
+                var religion_statistic = "";
+                for (var z=0; z<religions.length; z++) {
+                    religion = religions[z];
+                    var count = response.statistics.religion[religion];
+
+                    if (religion === "unknown") {
+                        religion_statistic += "<li style='color: red;'><em>" + religion + "</em>: <b>" + count + "</b></li>";
+                    } else {
+                        religion_statistic += "<li>" + religion + ": <b>" + count + "</b></li>";
+                    }
+                }
+                $("#stats_ul").html('<li class="nav-header">Statistics</li><li class="active"><a href="#"><b>religion</b></a></li>' + religion_statistic);
                 if (!kr.statistics.is_visible() && kr.statistics.toggle_show) {
                     kr.statistics.show();
                 }
