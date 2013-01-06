@@ -95,8 +95,11 @@ kr.refresh_markers = function(){
             $("#nav_status").html('<span class="label label-success">'+ response.places_of_worship_count + ' places</span>');
             if (response.statistics.religion !== undefined) {
                 var religion = $.map(response.statistics.religion,
-                    function(key, value) {
-                        return "<li>" + value + ": <b>" + key + "</b></li>";
+                    function(count, religion) {
+                        if (religion === "unknown") {
+                            return "<li style='color: red;'><em>" + religion + "</em>: <b>" + count + "</b></li>";
+                        }
+                        return "<li>" + religion + ": <b>" + count + "</b></li>";
                     }
                 );
                 $("#stats_ul").html('<li class="nav-header">Statistics</li><li class="active"><a href="#"><b>religion</b></a></li>' + religion.join(""));
