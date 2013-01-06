@@ -22,12 +22,6 @@ height: auto;
 </style>
 {% endblock %}
 
-{% block load_js %}
-{{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}openlayers/OpenLayers.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/worshipmap.js"></script>
-{% endblock %}
-
 {% load humanize %}
 {% block nav_right %}
 <li><a href="#" id="osm_count"><span class="label label-info">OpenStreetMap {{ osm_places_count|intcomma }} places</span></a></li>

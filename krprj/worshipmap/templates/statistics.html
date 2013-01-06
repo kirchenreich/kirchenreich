@@ -9,27 +9,6 @@ img {
 </style>
 {% endblock %}
 
-{% block load_js %}
-{{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}openlayers/OpenLayers.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/worshipmap.js"></script>
-{% endblock %}
-
-{% block run_js %}
-{{ block.super }}
-<script type="text/javascript">
-    $(document).ready(function(){
-        var center = [{{ point_for_openlayers.x }}, {{ point_for_openlayers.y }}];
-        kr.buildMap('map', center, 15, false);
-        kr.refresh_markers();
-        if (sessionStorage){
-            kr.session.set_possition(kr.map.getCenter())
-            kr.session.set_zoom(13)
-        }
-    });
-</script>
-{% endblock %}
-
 {% block content %}
 <div class="container">
     <div class="page-header">
