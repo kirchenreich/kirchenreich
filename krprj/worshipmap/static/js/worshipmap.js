@@ -1,7 +1,7 @@
 kr = {request_id: 0};
 
 kr.on_mobile = function(){
-    return (screen.width <= 480);
+    return (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i).test(navigator.userAgent);
 };
 
 kr.style = {
@@ -71,11 +71,13 @@ if (kr.on_mobile()) {
     kr.statistics.toggle();
 }
 
-kr.refresh_markers = function(){
+kr.refresh_markers = function(bounds){
+    bounds = bounds || kr.map.getBounds();
+
     $("#nav_status").html('<span class="label label-warning">Loading...</span>');
     kr.request_id++;
 
-    var url = "/api/v1/places/?epsg=4326&in_bbox=" + kr.map.getBounds().toBBoxString() + "&request_id=" + kr.request_id;
+    var url = "/api/v1/places/?epsg=4326&in_bbox=" + bounds.toBBoxString() + "&request_id=" + kr.request_id;
     if (kr.on_mobile()){
         url = url + "&limit=100";
     }
@@ -187,13 +189,22 @@ kr.on_marker_mousehover = function(e){
     $(e.target._icon).popover('show');
 };
 
-kr.buildMap = function(target_div, center, zoom, use_session){
-    if (use_session) {
+kr.buildMap = function(options){
+    options = {
+        target: options.target,
+        center: options.center,
+        zoom: options.zoom,
+        use_session: options.use_session || false,
+        locate: options.locate || false,
+        allow_selection: options.allow_selection || false
+    };
+
+    if (options.use_session) {
         if (kr.session.has_possition()) {
-            center = kr.session.get_possition();
+            options.center = kr.session.get_possition();
         }
         if (kr.session.has_zoom()) {
-            zoom = kr.session.get_zoom();
+            options.zoom = kr.session.get_zoom();
         }
     }
 
@@ -205,11 +216,11 @@ kr.buildMap = function(target_div, center, zoom, use_session){
             attribution: 'Map data © OpenStreetMap contributors, Imagery © CloudMade'
         }
     );
-    kr.map = L.map(target_div, {
+    kr.map = L.map(options.target, {
         csr: L.CRS.EPSG4326
     });
     kr.map.addLayer(osm_layer);
-    kr.map.setView(center, zoom);
+    kr.map.setView(options.center, options.zoom);
 
     // Base marker layer
     kr.markers = new L.LayerGroup();
@@ -243,12 +254,35 @@ kr.buildMap = function(target_div, center, zoom, use_session){
     };
 
     // Geolocation
-    kr.map.locate();
+    if (options.locate) {
+        kr.map.locate();
+    }
 
+    // Selection
+    if (!kr.on_mobile() && options.allow_selection) {
+        kr.locationSelection = new L.LocationFilter().addTo(kr.map);
+        var button = $("div.location-filter a");
+        button.text("");
+
+        kr.locationSelection.on("change", function (e) {
+            kr.refresh_markers(e.bounds);
+        });
+        kr.locationSelection.on("enabled", function (e) {
+            kr.refresh_markers(kr.locationSelection.getBounds());
+        });
+        kr.locationSelection.on("disabled", function () {
+            button.text("");
+            kr.refresh_markers();
+        });
+    }
 
     kr.map.on('moveend', function() {
+        if (kr.locationSelection !== undefined && kr.locationSelection.isEnabled()) {
+            return null;
+        }
+
         kr.refresh_markers();
-        if (use_session && sessionStorage) {
+        if (options.use_session && sessionStorage) {
             kr.session.set_possition(kr.map.getCenter());
             kr.session.set_zoom(kr.map.getZoom());
         }
@@ -256,7 +290,7 @@ kr.buildMap = function(target_div, center, zoom, use_session){
 
     kr.refresh_markers();
 
-    if (use_session && (kr.session.has_possition() || kr.session.has_zoom())) {
+    if (options.use_session && (kr.session.has_possition() || kr.session.has_zoom())) {
         kr.refresh_markers();
     }
 

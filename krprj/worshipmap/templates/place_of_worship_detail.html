@@ -29,7 +29,11 @@ img {
 <script type="text/javascript">
     $(document).ready(function(){
         var center = [{{ point_for_openlayers.y }}, {{ point_for_openlayers.x }}];
-        kr.buildMap('map', center, 15, false);
+        kr.buildMap({
+            target: 'map',
+            center: center,
+            zoom: 15,
+        });
         kr.refresh_markers();
         if (sessionStorage){
             kr.session.set_possition(kr.map.getCenter())
