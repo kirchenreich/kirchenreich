@@ -17,11 +17,11 @@ kr.style = {
 kr.session = {};
 
 kr.session.has_zoom = function(){
-    return sessionStorage && sessionStorage.kr_zoom;
+    return sessionStorage !== undefined && sessionStorage.kr_zoom !== undefined;
 };
 
 kr.session.has_possition = function(){
-    return sessionStorage && sessionStorage.kr_lng && sessionStorage.kr_lat;
+    return sessionStorage !== undefined && sessionStorage.kr_lng !== undefined && sessionStorage.kr_lat !== undefined;
 };
 
 kr.session.get_possition = function(){
