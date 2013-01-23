@@ -1,7 +1,6 @@
 from django.contrib.gis import admin
-
 from krprj.krunite.tasks import unite_osm_list
-from models import KircheOsm
+from models import KircheOsm, Ref
 
 
 class KircheOsmAdmin(admin.OSMGeoAdmin):
@@ -31,3 +30,11 @@ class KircheOsmAdmin(admin.OSMGeoAdmin):
     update_unite.short_description = "Update selected osm -> unite objects"
 
 admin.site.register(KircheOsm, KircheOsmAdmin)
+
+
+class RefAdmin(admin.OSMGeoAdmin):
+    fields = ('osm_id', 'need_update', 'last_update', 'created')
+    list_filter = ['need_update']
+    readonly_fields = ('last_update', 'created')
+
+admin.site.register(Ref, RefAdmin)

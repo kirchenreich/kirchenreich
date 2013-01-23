@@ -22,14 +22,10 @@ The whole sourcecode is on `Github <https://github.com/mfa/kirchenreich>`_ under
 Feel free to fork the repository, file bugrequests or even send in feature wishes.
 
 
-Demo / Live site
-----------------
+Live site
+---------
 
 Production site is http://kirchenreich.org/.
-
-A development version with a lot less data is running
-on `Gondor <http://gondor.io>`_ at http://dev.kirchenreich.org.
-
 
 
 Developer information
@@ -50,7 +46,9 @@ Install How-to
   pip install -r requirements.d/dev-standalone.txt
 
 
-* set in krprj/settings/local.py::
+* set in krprj/settings/local.py
+
+::
 
   # SECRET_KEY - see http://www.miniwebtool.com/django-secret-key-generator/
   # DATABASES - see settings.py for template without user/pw
@@ -60,6 +58,7 @@ Run locally
 ~~~~~~~~~~~
 
 * you need postgresql with postgis support!
+* for some stuff you may need redis and celery.
 * download world to world/data/:
 
 ::
@@ -78,4 +77,28 @@ Run locally
   load.run()
 
 
-* ./manage.py runserver
+* run testserver
+
+::
+
+  ./manage.py runserver
+
+
+Deploy on kirchereich.org
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* you need system user with sudo right on the server
+
+List of available commands:
+
+::
+
+  fab -l
+
+Run deployment on server:
+
+::
+
+  fab deploy -u <your system user>
+
+Notice that you may have to specify your server user name with the -u flag.

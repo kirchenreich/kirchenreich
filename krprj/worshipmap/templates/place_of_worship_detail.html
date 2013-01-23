@@ -1,7 +1,16 @@
 {% extends "base.html" %}
 
+{% block meta %}
+<meta name="description" content="Place of worship {{object.name|default_if_none:'unknow'}} with religion {{object.religion|default_if_none:'unknow'}}">
+<meta name="keywords" content="kirchenreich, place, of, worship, osm, openstreetmap, wikipedia, church, temple">
+{% endblock %}
+
 {% block load_css %}
 {{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}leaflet/leaflet.css" />
+<!--[if lte IE 8]>
+    <link rel="stylesheet" href="{{ STATIC_URL }}leaflet/leaflet.ie.css" />
+<![endif]-->
 <style>
 img {
     max-width: none; /* Fix twitter bootstrap to work together with OpenLayers */
@@ -11,7 +20,7 @@ img {
 
 {% block load_js %}
 {{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}openlayers/OpenLayers.js"></script>
+<script src="{{ STATIC_URL }}leaflet/leaflet.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/worshipmap.js"></script>
 {% endblock %}
 
@@ -19,8 +28,12 @@ img {
 {{ block.super }}
 <script type="text/javascript">
     $(document).ready(function(){
-        var center = [{{ point_for_openlayers.x }}, {{ point_for_openlayers.y }}];
-        kr.buildMap('map', center, 15, false);
+        var center = [{{ point_for_openlayers.y }}, {{ point_for_openlayers.x }}];
+        kr.buildMap({
+            target: 'map',
+            center: center,
+            zoom: 15,
+        });
         kr.refresh_markers();
         if (sessionStorage){
             kr.session.set_possition(kr.map.getCenter())
@@ -31,21 +44,21 @@ img {
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container" itemscope itemtype="http://schema.org/Place">
     <div class="page-header">
-        <h1>{{ object.name|default_if_none:"<em>unknown</em>"|safe }}</h1>
+        <h1 itemprop="name">{{ object.name|default_if_none:"<em>unknown</em>"|safe }}</h1>
     </div>
     <div class="row">
         <div class="span6">
-            <table class="table table-bordered">
+            <table class="table table-bordered" itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
                 <tbody>
                     <tr>
                         <td>Latitude</td>
-                        <td>{{ object.point.x }}</td>
+                        <td>{{ object.point.x }}<meta itemprop="latitude" content="{{ object.point.x }}" /></td>
                     </tr>
                     <tr>
                         <td>Longitude</td>
-                        <td>{{ object.point.y }}</td>
+                        <td>{{ object.point.y }}<meta itemprop="longitude" content="{{ object.point.y }}" /></td>
                     </tr>
                     <tr>
                         <td>Religion</td>
@@ -59,11 +72,42 @@ img {
             </table>
             <div class="tabbable">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#osm" data-toggle="tab">OpenStreetMap</a></li>
-                    <li><a href="#wikipedia" data-toggle="tab">Wikipedia</a></li>
+                    <li class="active"><a href="#links" data-toggle="tab">Links</a></li>
+                    <li><a href="#osm" data-toggle="tab">OpenStreetMap</a></li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane active" id="osm">
+                    <div class="tab-pane active" id="links">
+		        {% if object.osm_url|length > 0 %}
+                        <h3>Openstreetmap reference</h3>
+                        <ul>
+                            <li><a href="{{ object.osm_url }}">Details on this {{ object.get_osm_type_display }}</a></li>
+                        </ul>
+                        {% else %}
+                        <div class="alert alert-info">This place has <strong>no</strong> correct connection to Openstreetmap.</div>
+			<!-- osm_id: {{ object.osm_id }} -->
+                        {% endif %}
+
+			{% if object.unite %}
+			<h3>Country</h3>
+			<ul>
+                            <li>This place of worship is in {{ object.unite.country.name }}</li>
+			</ul>
+                        {% else %}
+                        <div class="alert alert-info">This place <strong>isn't</strong> connected to a country.</div>
+                        {% endif %}
+
+                        {% if wikipedia_pages|length > 0 %}
+                        <h3>Wikipedia Article{{ wikipedia_pages|length|pluralize }}</h3>
+                        <ul>
+                            {% for wikipedia_page in wikipedia_pages %}
+                            <li><a href="{{ wikipedia_page.url }}">{{ wikipedia_page }}</a></li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="alert alert-info">This place <strong>isn't</strong> connected with a wikipedia article.</div>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane" id="osm">
                         {% if addional_fields|length > 0 %}
                         <table class="table table-bordered">
                             <tbody>
@@ -79,22 +123,10 @@ img {
                         <div class="alert alert-info">There are no addional information from OpenStreetMap</div>
                         {% endif %}
                     </div>
-                    <div class="tab-pane" id="wikipedia">
-                        {% if wikipedia_pages|length > 0 %}
-                        <h3>Wikipedia Article{{ wikipedia_pages|length|pluralize }}</h3>
-                        <ul>
-                            {% for wikipedia_page in wikipedia_pages %}
-                            <li><a href="{{ wikipedia_page.url }}">{{ wikipedia_page }}</a></li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        <div class="alert alert-info">This place <strong>isn't</strong> connected with a wikipedia article.</div>
-                        {% endif %}
-                    </div>
                 </div>
             </div>
         </div>
-        <div class="span6" style="height: 80%"><div id="map"></div></div>
+        <div class="span6" id="map" style="height: 500px"></div>
     </div>
 
 </div>

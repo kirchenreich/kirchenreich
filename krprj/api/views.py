@@ -6,9 +6,10 @@ from django.http import HttpResponse
 from django.views.generic import View
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geos import Point, Polygon
+from django.db.models import Count
+import collections
 
 from krprj.osm.models import KircheOsm
-
 
 @login_required()
 def api_status(request):
@@ -38,12 +39,16 @@ class PlacesResource(View):
             return JSONResponse(message="missing search area", _code=422)
 
         # Get cordinates for bbox from get parameter
-        p1x, p1y, p2x, p2y = (
-            float(n) for n in request.GET.get('in_bbox').split(',')
-        )
+        try:
+            p1x, p1y, p2x, p2y = (
+                float(n) for n in request.GET.get('in_bbox').split(',')
+                )
+        except ValueError:
+            return JSONResponse(message="wrong data in parameter in_bbox",
+                                _code=422)
         # Create min and max points with cordinates in EPSG:900913 for bbox
-        p1 = Point(p1x, p1y, srid=3857)
-        p2 = Point(p2x, p2y, srid=3857)
+        p1 = Point(p1x, p1y, srid=request.GET.get('epsg', 4326))
+        p2 = Point(p2x, p2y, srid=request.GET.get('epsg', 4326))
 
         # Transform EPSG:900913 (from OpenLayers) to EPSG:4326 (WGS64)
         p1.transform(4326)
@@ -61,8 +66,22 @@ class PlacesResource(View):
         # Look for countries which are intersects by our visible map limited
         # by GET parameter or max value
         limit = request.GET.get('limit', 500)
-        places = KircheOsm.objects\
+        places = KircheOsm.objects \
                           .filter(mpoly__intersects=visible_map)[0:limit]
+
+        # religion statistic
+        religions = KircheOsm.objects \
+                             .filter(mpoly__intersects=visible_map)[0:limit] \
+                             .values_list('religion') \
+                             .annotate(count=Count("id"))
+        religions = dict(religions)
+        if None in religions:
+            religions['unknown'] = religions[None]
+            del religions[None]
+
+        statistics = {
+            'religion': religions
+        }
 
         # Create our json objects of places
         places_of_worship = []
@@ -91,5 +110,6 @@ class PlacesResource(View):
         return JSONResponse(
             request_id=request.GET.get('request_id'),
             places_of_worship=places_of_worship,
-            places_of_worship_count=places.count()
+            places_of_worship_count=places.count(),
+            statistics=statistics
         )

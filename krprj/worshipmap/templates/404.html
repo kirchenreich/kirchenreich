@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block load_css %}
+{{ block.super }}
+<style>
+img {
+    max-width: none; /* Fix twitter bootstrap to work together with OpenLayers */
+}
+
+#fourOhfour {
+height: 100%;
+width: 100%;
+position: fixed;
+left: 0px;
+top: 0px;
+z-index: -1;
+}
+.stretch {
+width: 100%;
+height: auto;
+}
+</style>
+{% endblock %}
+
+{% load humanize %}
+{% block nav_right %}
+<li><a href="#" id="osm_count"><span class="label label-info">OpenStreetMap {{ osm_places_count|intcomma }} places</span></a></li>
+<li><a href="#" id="wikipedia_count"><span class="label label-info">Wikipedia {{ wikipedia_places_count|intcomma }} places</span></a></li>
+<li><a href="#" id="nav_status"></a></li>
+{% endblock %}
+
+
+{% block content %}
+<div id="fourOhfour">
+  <img src="{{ STATIC_URL }}images/404.jpg" class="stretch" alt="" />
+</div>
+{% endblock %}
