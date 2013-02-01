@@ -7,9 +7,9 @@ from django.views.generic import View
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geos import Point, Polygon
 from django.db.models import Count
-import collections
 
 from krprj.osm.models import KircheOsm
+from krprj.krunite.models import KircheUnite
 
 @login_required()
 def api_status(request):
@@ -66,14 +66,14 @@ class PlacesResource(View):
         # Look for countries which are intersects by our visible map limited
         # by GET parameter or max value
         limit = request.GET.get('limit', 500)
-        places = KircheOsm.objects \
-                          .filter(mpoly__intersects=visible_map)[0:limit]
+        places = KircheUnite.objects \
+                            .filter(point__contained=visible_map)[0:limit]
 
         # religion statistic
-        religions = KircheOsm.objects \
-                             .filter(mpoly__intersects=visible_map)[0:limit] \
-                             .values_list('religion') \
-                             .annotate(count=Count("id"))
+        religions = KircheUnite.objects \
+                               .filter(point__contained=visible_map)\
+                               .values_list('religion') \
+                               .annotate(count=Count("id"))
         religions = dict(religions)
         if None in religions:
             religions['unknown'] = religions[None]
@@ -86,7 +86,6 @@ class PlacesResource(View):
         # Create our json objects of places
         places_of_worship = []
         for place in places:
-
             # Use the GeoDjango Point type to transform the cordinations in
             # other epsg formats
             if not place.point:
@@ -98,7 +97,7 @@ class PlacesResource(View):
                                     _code=422)
 
             _place = {
-                'id': place.id,
+                'id': place.pk,
                 'name': place.name,
                 'lon': place.point.x,
                 'lat': place.point.y,

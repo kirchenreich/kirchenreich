@@ -28,7 +28,7 @@ img {
 {{ block.super }}
 <script type="text/javascript">
     $(document).ready(function(){
-        var center = [{{ point_for_openlayers.y }}, {{ point_for_openlayers.x }}];
+        var center = [{{ point.y }}, {{ point.x }}];
         kr.buildMap({
             target: 'map',
             center: center,
@@ -72,43 +72,65 @@ img {
             </table>
             <div class="tabbable">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#links" data-toggle="tab">Links</a></li>
-                    <li><a href="#osm" data-toggle="tab">OpenStreetMap</a></li>
+                    <li class="active"><a href="#checks" data-toggle="tab">Checks</a></li>
+                    {% for osm_place in osm_places %}
+                    <li><a href="#osm{{ forloop.counter }}" data-toggle="tab">OpenStreetMap #{{ forloop.counter }}</a></li>
+                    {% endfor %}
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane active" id="links">
-		        {% if object.osm_url|length > 0 %}
-                        <h3>Openstreetmap reference</h3>
-                        <ul>
-                            <li><a href="{{ object.osm_url }}">Details on this {{ object.get_osm_type_display }}</a></li>
-                        </ul>
-                        {% else %}
-                        <div class="alert alert-info">This place has <strong>no</strong> correct connection to Openstreetmap.</div>
-			<!-- osm_id: {{ object.osm_id }} -->
+                    <div class="tab-pane active" id="checks">
+                        <h3>Kirchenreich.org Checks</h3>
+                        <p>We want to improve the quality of the information in OpenStreetMap about places of worship. So we run some tests to check the quality of this place data.</p>
+                        <strong>Quality meter</strong>
+                        {% if checks_percent_reached < 25 %}
+                        <div class="progress progress-danger">
+                          <div class="bar" style="width: {{ checks_percent_reached }}%;">{{ checks_percent_reached }}%</div>
+                        </div>
+                        {% elif checks_percent_reached > 25 and checks_percent_reached < 50 %}
+                        <div class="progress progress-warning">
+                          <div class="bar" style="width: {{ checks_percent_reached }}%;">{{ checks_percent_reached }}%</div>
+                        </div>
+                        {% elif checks_percent_reached > 50 and checks_percent_reached < 80 %}
+                        <div class="progress progress-info">
+                          <div class="bar" style="width: {{ checks_percent_reached }}%;">{{ checks_percent_reached }}%</div>
+                        </div>
+                        {% elif checks_percent_reached > 80 and checks_percent_reached < 100 %}
+                        <div class="progress progress-success">
+                          <div class="bar" style="width: {{ checks_percent_reached }}%;">{{ checks_percent_reached }}%</div>
+                        </div>
                         {% endif %}
-
-			{% if object.unite %}
-			<h3>Country</h3>
-			<ul>
-                            <li>This place of worship is in {{ object.unite.country.name }}</li>
-			</ul>
-                        {% else %}
-                        <div class="alert alert-info">This place <strong>isn't</strong> connected to a country.</div>
-                        {% endif %}
-
-                        {% if wikipedia_pages|length > 0 %}
-                        <h3>Wikipedia Article{{ wikipedia_pages|length|pluralize }}</h3>
-                        <ul>
-                            {% for wikipedia_page in wikipedia_pages %}
-                            <li><a href="{{ wikipedia_page.url }}">{{ wikipedia_page }}</a></li>
+                        <ul class="unstyled">
+                            {% for check in checks.pretty %}
+                            <li>
+                                {% if check.value %}
+                                <span class="badge badge-success"><i class="icon-ok-circle icon-white"></i></span>
+                                {% else %}
+                                <span class="badge badge-important"><i class="icon-ban-circle icon-white"></i></span>
+                                {% endif %}
+                                {{ check.description }}</li>
                             {% endfor %}
                         </ul>
-                        {% else %}
-                        <div class="alert alert-info">This place <strong>isn't</strong> connected with a wikipedia article.</div>
-                        {% endif %}
                     </div>
-                    <div class="tab-pane" id="osm">
-                        {% if addional_fields|length > 0 %}
+                    {% for osm_place in osm_places %}
+                    <div class="tab-pane" id="osm{{ forloop.counter }}">
+                        <h3>OpenStreetMap ({{ osm_place.osm_id }})</h3>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr class="{% if osm_place.name == None %}error{% endif %}">
+                                    <td>Name</td>
+                                    <td>{{ osm_place.name|default_if_none:'<em>unknown</em>'|safe }}</td>
+                                </tr>
+                                <tr class="{% if osm_place.religion == None %}error{% endif %}">
+                                    <td>Religion</td>
+                                    <td>{{ osm_place.religion|default_if_none:'<em>unknown</em>'|safe }}</td>
+                                </tr>
+                                <tr class="{% if osm_place.denomination == None %}error{% endif %}">
+                                    <td>Denomination</td>
+                                    <td>{{ osm_place.denomination|default_if_none:'<em>unknown</em>'|safe }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        {% if osm_place.addional_fields|length > 0 %}
                         <table class="table table-bordered">
                             <tbody>
                                 {% for key, value in addional_fields.items %}
@@ -122,7 +144,11 @@ img {
                         {% else %}
                         <div class="alert alert-info">There are no addional information from OpenStreetMap</div>
                         {% endif %}
+                        {% if osm_place.osm_url %}
+                        <p>You can get more information about this OpenStreetMap entry <a href="{{ osm_place.osm_url }}">here</a>.</p>
+                        {% endif %}
                     </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

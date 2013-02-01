@@ -1,5 +1,6 @@
 import json
 from django.contrib.gis.db import models
+from django.db.models import Count
 
 from krprj.world.models import WorldBorder
 from krprj.wikipedia.models import KircheWikipedia
@@ -9,16 +10,21 @@ class KircheChecks(models.Model):
     """
     """
 
-    osm = models.BooleanField(default=False)
+    osm = models.BooleanField("Has OpenStreetMap place",
+                              default=False)
+    osm_name = models.BooleanField("OpenStreetMap place is named",
+                                   default=False)
+    osm_religion = models.BooleanField("OpenStreetMap place has information "
+                                       "about religion", default=False)
+    osm_denomination = models.BooleanField("OpenStreetMap knows the "
+                                           "denomination", default=False)
+    osm_address_complete = models.BooleanField("There is a full address in "
+                                               "OpenStreetMap", default=False)
 
-    osm_name = models.BooleanField(default=False)
-    osm_religion = models.BooleanField(default=False)
-    osm_denomination = models.BooleanField(default=False)
-    osm_address_complete = models.BooleanField(default=False)
+    wikipedia = models.BooleanField("Has wikipedia article", default=False)
 
-    wikipedia = models.BooleanField(default=False)
-
-    wikipedia_infobox = models.BooleanField(default=False)
+    wikipedia_infobox = models.BooleanField("Wikipedia article has infobox",
+                                            default=False)
 
     last_update = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -45,6 +51,23 @@ class KircheChecks(models.Model):
             if isinstance(field, models.BooleanField) \
             and getattr(self, field.name):
                 checks.append(field.name)
+        return checks
+
+    @property
+    def percent_reached(self):
+        return float(len(self.achieved)) / float(len(self.available)) * 100
+
+    @property
+    def pretty(self):
+        checks = []
+        print dir(self._meta)
+        for check in self.available:
+            field = self._meta.get_field_by_name(check)[0]
+            checks.append({
+                'name': check,
+                'description': field.verbose_name,
+                'value': getattr(self, check)
+            })
         return checks
 
     def _run(self):
@@ -78,7 +101,7 @@ class KircheChecks(models.Model):
             self.save()
 
 
-class KircheUniteManager(models.Manager):
+class KircheUniteManager(models.GeoManager):
 
     def get_by_osm_or_create(self, osm):
         """Get a KircheUnit object for KircheOsm object. If there no
@@ -110,11 +133,13 @@ class KircheUnite(models.Model):
 
     # name field is only for convenience
     name = models.TextField(blank=True, null=True, default=None)
-    point = models.PointField(blank=True, null=True)
+    religion = models.TextField(blank=True, null=True, default=None)
+    denomination = models.TextField(blank=True, null=True, default=None)
 
+    point = models.PointField(srid=4326, blank=True, null=True)
     country = models.ForeignKey(WorldBorder, blank=True, null=True)
 
-    checks = models.OneToOneField(KircheChecks, related_name='unite',
+    checks = models.OneToOneField(KircheChecks, related_name='kircheunite',
                                   blank=True, null=True)
     last_update = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -124,6 +149,33 @@ class KircheUnite(models.Model):
 
     def __unicode__(self):
         return "%d [%s]" % (self.id, self.name or '')
+
+    def update(self):
+        """Update basedata, wikipedia; country; checks"""
+        self.update_basedata()
+        self.update_wikipedia()
+        self.update_country()
+        self.update_checks()
+
+    def update_basedata(self):
+        """If the unite doesn't have the basedata than it will try to get it
+        from OSM or maybe wikipedia.
+        """
+        religion = self.kircheosm_set.values_list('religion') \
+                                     .annotate(count=Count("id")) \
+                                     .order_by('count')[0][0]
+
+        denomination = self.kircheosm_set.values_list('denomination') \
+                                         .annotate(count=Count("id")) \
+                                         .order_by('count')[0][0]
+
+        if religion:
+            self.religion = religion
+        if denomination:
+            self.denomination = denomination
+
+        if religion or denomination:
+            self.save()
 
     def update_wikipedia(self):
         """Try to find some wikipedia objects within a radius of 100m to the

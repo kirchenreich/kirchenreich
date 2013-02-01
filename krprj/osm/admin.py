@@ -22,12 +22,18 @@ class KircheOsmAdmin(admin.OSMGeoAdmin):
         }),
     )
 
-    actions = ['update_unite']
+    actions = ['update_unite', 'unite_new']
 
     def update_unite(self, request, queryset):
         unite_osm_list.delay(queryset)
         self.message_user(request, "Started %s tasks." % queryset.count())
     update_unite.short_description = "Update selected osm -> unite objects"
+
+    def unite_new(self, request, queryset):
+        unite_osm_list.delay(KircheOsm.objects.filter(unite__isnull=True))
+        self.message_user(request,
+                          "Started %s tasks." % unite_osm_list.count())
+    unite_new.short_description = "Unite *ALL* allow osm places"
 
 admin.site.register(KircheOsm, KircheOsmAdmin)
 

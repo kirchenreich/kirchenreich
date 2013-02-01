@@ -68,9 +68,10 @@ class KircheOsm(models.Model):
     def osm_url(self):
         if self.osm_type:
             base = 'http://www.openstreetmap.org/browse'
-            return "%s/%s/%d" % (base, self.get_osm_type_display(), self.osm_id)
+            return "%s/%s/%d" % (base, self.get_osm_type_display(),
+                                 self.osm_id)
         else:
-            return ''
+            return None
 
     def jsonify(self):
         d = {'osm_id': self.osm_id,

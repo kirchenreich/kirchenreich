@@ -4,8 +4,8 @@ from copy import copy
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 
-from krprj.osm.models import KircheOsm
-from krprj.osm.models import Ref
+from krprj.krunite.models import KircheUnite
+from krprj.osm.models import KircheOsm, Ref
 from krprj.wikipedia.models import KircheWikipedia
 
 import datetime
@@ -30,29 +30,36 @@ class PlaceOfWorshipDetailView(DetailView):
     """The detail view about a place of worship"""
 
     template_name = "place_of_worship_detail.html"
-    model = KircheOsm
+    model = KircheUnite
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(PlaceOfWorshipDetailView, self).get_context_data(
             **kwargs)
 
-        # Need point of place in EPSG:4326 for Leaflet but don't want to
-        # change self.object.point
-        point = copy(self.object.point)
-        point.transform(4326)
-        context['point_for_openlayers'] = point
-
-        context['addional_fields'] = json.loads(
-            self.object.addional_fields
+        context['checks'] = self.object.checks
+        context['checks_percent_reached'] = round(
+            self.object.checks.percent_reached
         )
 
-        if self.object.unite:
-            context['checks'] = self.object.unite.checks
-            context['wikipedia_pages'] = self.object.unite\
-                                                    .kirchewikipedia_set.all()
+        self.object.point.transform(4326)
+        context['point'] = self.object.point
 
+        context['osm_places'] = []
+        for osm_place in self.object.kircheosm_set.all():
+            # Need point of place in EPSG:4326 for Leaflet
+            osm_place.point.transform(4326)
+            context['osm_places'].append({
+                'osm_id': osm_place.osm_id,
+                'name': osm_place.name,
+                'religion': osm_place.religion,
+                'denomination': osm_place.denomination,
+                'point': osm_place.point,
+                'addional_fields': json.loads(osm_place.addional_fields)
+            })
+        context['wikipedia_pages'] = self.object.kirchewikipedia_set.all()
         return context
+
 
 class StatisticsView(TemplateView):
     """Show some stats about the data"""

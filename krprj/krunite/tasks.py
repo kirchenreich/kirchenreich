@@ -15,7 +15,6 @@ from krprj.krunite.tasks import unite_osm
         unite.update_country()
         unite.update_wikipedia()
         unite.update_checks()
-
     return True
 
 
@@ -24,3 +23,29 @@ def unite_osm_list(osm_list):
     for osm_obj in osm_list:
         unite_osm.delay(osm_obj)
     return len(osm_list)
+
+
+@task
+def update_checks(unite):
+    unite.update_checks()
+    return True
+
+
+@task
+def update_checks_list(unite_list):
+    for unite in unite_list:
+        update_checks.delay(unite)
+    return len(unite_list)
+
+
+@task
+def update_unite(unite):
+    unite.update()
+    return True
+
+
+@task
+def update_unite_list(unite_list):
+    for unite in unite_list:
+        update_unite.delay(unite)
+    return len(unite_list)
