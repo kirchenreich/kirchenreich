@@ -10,18 +10,18 @@ class KircheChecks(models.Model):
     """
     """
 
-    osm = models.BooleanField("Has OpenStreetMap place",
+    osm = models.BooleanField("OpenStreetMap place",
                               default=False)
     osm_name = models.BooleanField("OpenStreetMap place is named",
                                    default=False)
-    osm_religion = models.BooleanField("OpenStreetMap place has information "
+    osm_religion = models.BooleanField("OpenStreetMap has information "
                                        "about religion", default=False)
     osm_denomination = models.BooleanField("OpenStreetMap knows the "
                                            "denomination", default=False)
-    osm_address_complete = models.BooleanField("There is a full address in "
+    osm_address_complete = models.BooleanField("Full address in "
                                                "OpenStreetMap", default=False)
 
-    wikipedia = models.BooleanField("Has wikipedia article", default=False)
+    wikipedia = models.BooleanField("Wikipedia article", default=False)
 
     wikipedia_infobox = models.BooleanField("Wikipedia article has infobox",
                                             default=False)
@@ -163,11 +163,15 @@ class KircheUnite(models.Model):
         """
         religion = self.kircheosm_set.values_list('religion') \
                                      .annotate(count=Count("id")) \
-                                     .order_by('count')[0][0]
+                                     .order_by('count')
+        if len(religion) > 0:
+            religion = religion[0][0]
 
         denomination = self.kircheosm_set.values_list('denomination') \
                                          .annotate(count=Count("id")) \
-                                         .order_by('count')[0][0]
+                                         .order_by('count')
+        if len(denomination) > 0:
+            denomination = denomination[0][0]
 
         if religion:
             self.religion = religion
