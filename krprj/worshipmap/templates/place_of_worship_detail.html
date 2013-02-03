@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load humanize_latlon %}
+
 {% block meta %}
 <meta name="description" content="Place of worship {{object.name|default_if_none:'unknow'}} with religion {{object.religion|default_if_none:'unknow'}}">
 <meta name="keywords" content="kirchenreich, place, of, worship, osm, openstreetmap, wikipedia, church, temple">
@@ -46,7 +48,7 @@ img {
 {% block content %}
 <div class="container" itemscope itemtype="http://schema.org/Place">
     <div class="page-header">
-        <h1 itemprop="name">{{ object.name|default_if_none:"<em>unknown</em>"|safe }}</h1>
+        <h1 itemprop="name">{{ object.name|default_if_none:"<em>unknown</em>"|safe }} <small style="float: right">{% humanize_point object.point %}</small></h1>
     </div>
     <div class="row">
         <div class="span6">
@@ -54,11 +56,11 @@ img {
                 <tbody>
                     <tr>
                         <td>Latitude</td>
-                        <td>{{ object.point.x }}<meta itemprop="latitude" content="{{ object.point.x }}" /></td>
+                        <td>{{ object.point.y }}<meta itemprop="latitude" content="{{ object.point.y }}" /></td>
                     </tr>
                     <tr>
                         <td>Longitude</td>
-                        <td>{{ object.point.y }}<meta itemprop="longitude" content="{{ object.point.y }}" /></td>
+                        <td>{{ object.point.x }}<meta itemprop="longitude" content="{{ object.point.x }}" /></td>
                     </tr>
                     <tr>
                         <td>Religion</td>
@@ -75,6 +77,9 @@ img {
                     <li class="active"><a href="#checks" data-toggle="tab">Checks</a></li>
                     {% for osm_place in osm_places %}
                     <li><a href="#osm{{ forloop.counter }}" data-toggle="tab">OpenStreetMap #{{ forloop.counter }}</a></li>
+                    {% endfor %}
+                    {% for wikipedia_pages in wikipedia_pages %}
+                    <li><a href="#wikipedia{{ forloop.counter }}" data-toggle="tab">Wikipedia #{{ forloop.counter }}</a></li>
                     {% endfor %}
                 </ul>
                 <div class="tab-content">
@@ -147,6 +152,12 @@ img {
                         {% if osm_place.osm_url %}
                         <p>You can get more information about this OpenStreetMap entry <a href="{{ osm_place.osm_url }}">here</a>.</p>
                         {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% for wikipedia_page in wikipedia_pages %}
+                    <div class="tab-pane" id="wikipedia{{ forloop.counter }}">
+                        <h3>{{ wikipedia_page.title }}</h3>
+                        <p>Read more about {{ wikipedia_page.title }} in the Wikipedia <a href="{{ wikipedia_page.url }}">here</a>.</p>
                     </div>
                     {% endfor %}
                 </div>

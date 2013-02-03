@@ -60,7 +60,6 @@ class KircheChecks(models.Model):
     @property
     def pretty(self):
         checks = []
-        print dir(self._meta)
         for check in self.available:
             field = self._meta.get_field_by_name(check)[0]
             checks.append({
