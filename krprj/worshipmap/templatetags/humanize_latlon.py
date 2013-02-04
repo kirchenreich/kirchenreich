@@ -55,3 +55,11 @@ def humanize_latlon(latitude, longitude):
 @register.simple_tag
 def humanize_point(point):
     return humanize_latlon(point.y, point.x)
+
+
+@register.filter
+def as_dms(decimal, coordinate_type):
+    return u"{0} {1}°{2}'{3}''".format(
+        decimal_to_direction(decimal, coordinate_type),
+        *decimal_to_dms(decimal)
+    )

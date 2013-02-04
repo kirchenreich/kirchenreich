@@ -56,11 +56,11 @@ img {
                 <tbody>
                     <tr>
                         <td>Latitude</td>
-                        <td>{{ object.point.y }}<meta itemprop="latitude" content="{{ object.point.y }}" /></td>
+                        <td>{{ object.point.y|as_dms:'lat' }}<meta itemprop="latitude" content="{{ object.point.y }}" /></td>
                     </tr>
                     <tr>
                         <td>Longitude</td>
-                        <td>{{ object.point.x }}<meta itemprop="longitude" content="{{ object.point.x }}" /></td>
+                        <td>{{ object.point.x|as_dms:'lon' }}<meta itemprop="longitude" content="{{ object.point.x }}" /></td>
                     </tr>
                     <tr>
                         <td>Religion</td>
