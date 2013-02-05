@@ -51,8 +51,8 @@ class PlacesResource(View):
         p2 = Point(p2x, p2y, srid=request.GET.get('epsg', 4326))
 
         # Transform EPSG:900913 (from OpenLayers) to EPSG:4326 (WGS64)
-        p1.transform(4326)
-        p2.transform(4326)
+        p1.transform(srid=4326)
+        p2.transform(srid=4326)
 
         # Create bbox which represents the visible map
         visible_map = Polygon.from_bbox(
@@ -91,7 +91,7 @@ class PlacesResource(View):
             if not place.point:
                 continue
             try:
-                place.point.transform(request.GET.get('epsg', 4326))
+                place.point.transform(srid=request.GET.get('epsg', 4326))
             except Exception:
                 return JSONResponse(message='Error by epsg transformation',
                                     _code=422)
