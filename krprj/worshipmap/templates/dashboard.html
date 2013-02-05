@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% load humanize %}
+
+{% block load_css %}
+{{ block.super }}
+<link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
+{% endblock %}
+
+{% block load_js %}
+{{ block.super }}
+<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="{{ STATIC_URL }}jquery_flot/excanvas.min.js"></script><![endif]-->
+<script type="text/javascript" src="{{ STATIC_URL }}jquery_flot/jquery.flot.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}jquery_flot/jquery.flot.pie.js"></script>
+<script>
+    $(document).ready(function(){
+        var data = [{
+            label: 'OpenStreetMap',
+            data: {{ osm_count }},
+            color: '#ffc40d'
+        }, {
+            label: 'Wikipedia',
+            data: {{ wikipedia_count }},
+            color: '#049cdb'
+        }];
+        $.plot($('#pie1'), data, {
+            series: {
+                pie: {
+                    show: true,
+                    label: {
+                        show: true,
+                        radius: 3/4,
+                        formatter: function(label, series){
+                            return '<div style="font-size:8pt;text-align:center;padding:2px;color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>';
+                        },
+                        background: {
+                            opacity: 0.5,
+                            color: '#000'
+                        }
+                    },
+                }
+            },
+            legend: {
+                show: false
+            }
+        });
+    })
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Dashboard</h1>
+    </div>
+    <div class="row">
+        <div class="span10" style="text-align: center">
+            <div class="state-box">
+                    <p id="value">{{ osm_count|intcomma }}</p>
+                    <p id="help">OpenStreetMap places</p>
+            </div>
+            <span style="font-size: 50px">+</span>
+            <div class="state-box">
+                    <p id="value">{{ wikipedia_count|intcomma }}</p>
+                    <p id="help">Wikipedia articles</p>
+            </div>
+            <span style="font-size: 50px">&rarr;</span>
+            <div class="state-box">
+                    <p id="value">{{ krunite_count|intcomma }}</p>
+                    <p id="help">Places of worship</p>
+            </div>
+        </div>
+        <div class="span2">
+            <div id="pie1" style="height: 200px"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span12">
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="span6">
+            <h2>OpenStreetMap</h2>
+            <div class="state-box">
+                    <p id="value">{{ ref_need_update|intcomma }} / {{ ref_count|intcomma }}</p>
+                    <p id="help">References need update</p>
+            </div>
+            <div class="state-box">
+                    <p id="value">{{ osm_type.W|intcomma }}</p>
+                    <p id="help">Included ways</p>
+            </div>
+            <div class="state-box">
+                    <p id="value">{{ osm_type.N|intcomma }}</p>
+                    <p id="help">Included nodes</p>
+            </div>
+        </div>
+    </div>
+
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>References need update</td>
+                        <td>{{ ref_need_update }} / {{ ref_count }}</td>
+                    </tr>
+                    <tr>
+                        <td>osm_types</td>
+                        <td><table class="table table-striped">
+			  {% for key, value in osm_type %}
+			    <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+			    {% endfor %}
+			    </table>
+			</td>
+                    </tr>
+                    <tr>
+                        <td>Last update of OSM datasets</td>
+                        <td><table class="table table-striped">
+			    <tr><td>last 7 days</td><td>{{ last_7days }}</td></tr>
+			    <tr><td>More than one week ago</td><td>{{ older_than_1week }}</td></tr>
+			    <tr><td>More than two weeks ago</td><td>{{ older_than_2weeks }}</td></tr>
+			    <tr><td>More than three weeks ago</td><td>{{ older_than_3weeks }}</td></tr>
+			  </table>
+			</td>
+                    </tr>
+		</tbody>
+	    </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
