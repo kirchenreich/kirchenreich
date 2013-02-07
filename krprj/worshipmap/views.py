@@ -2,7 +2,7 @@ import json
 
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from krprj.krunite.models import KircheUnite
 from krprj.osm.models import KircheOsm, Ref
@@ -83,6 +83,11 @@ class DashboardView(TemplateView):
         context['osm_type'] = KircheOsm.objects.values_list('osm_type') \
                                                .annotate(count=Count("id"))
         context['osm_type'] = dict(context['osm_type'])
+
+        # Wikipedia
+        context['wikipedia_infobox_count'] = KircheWikipedia.objects \
+                                                .filter(~Q(infobox="{}")) \
+                                                .count()
 
         # date
         context['last_7days'] = KircheOsm.objects.filter(
