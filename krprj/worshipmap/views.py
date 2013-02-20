@@ -42,13 +42,13 @@ class PlaceOfWorshipDetailView(DetailView):
             self.object.checks.percent_reached
         )
 
-        self.object.point.transform(srid=4326)
+        self.object.point.transform(4326)
         context['point'] = self.object.point
 
         context['osm_places'] = []
         for osm_place in self.object.kircheosm_set.all():
             # Need point of place in EPSG:4326 for Leaflet
-            osm_place.point.transform(srid=4326)
+            osm_place.point.transform(4326)
             context['osm_places'].append({
                 'osm_id': osm_place.osm_id,
                 'name': osm_place.name,
