@@ -228,27 +228,27 @@ kr.buildMap = function(options){
 
     kr.marker_icons = {
         'default': L.icon({
-            iconUrl: STATIC_URL + 'icons/pin.png',
+            iconUrl: STATIC_URL + 'lib/kirchenreich/icons/pin.png',
             iconSize: [15, 24]
         }),
         'christian': L.icon({
-            iconUrl: STATIC_URL + 'icons/christianity_church.png',
+            iconUrl: STATIC_URL + 'lib/kirchenreich/icons/christianity_church.png',
             iconSize: [24, 25]
         }),
         'islam': L.icon({
-            iconUrl: STATIC_URL + 'icons/islam.png',
+            iconUrl: STATIC_URL + 'lib/kirchenreich/icons/islam.png',
             iconSize: [25, 24]
         }),
         'muslim': L.icon({
-            iconUrl: STATIC_URL + 'icons/islam.png',
+            iconUrl: STATIC_URL + 'lib/kirchenreich/icons/islam.png',
             iconSize: [25, 24]
         }),
         'hindu': L.icon({
-            iconUrl: STATIC_URL + 'icons/hindu.png',
+            iconUrl: STATIC_URL + 'lib/kirchenreich/icons/hindu.png',
             iconSize: [24, 24]
         }),
         'budddhist': L.icon({
-            iconUrl: STATIC_URL + 'icons/buddhist.png',
+            iconUrl: STATIC_URL + 'lib/kirchenreich/icons/buddhist.png',
             iconSize: [28, 22]
         })
     };
