@@ -1,13 +1,8 @@
 {% extends "base.html" %}
 
-{% block load_css %}
+{% block css %}
 {{ block.super }}
-<link rel="stylesheet" href="{{ STATIC_URL }}leaflet/leaflet.css" />
-<!--[if lte IE 8]>
-    <link rel="stylesheet" href="{{ STATIC_URL }}leaflet/leaflet.ie.css" />
-<![endif]-->
-<link rel="stylesheet" href="{{ STATIC_URL }}leaflet_locationfilter/locationfilter.css" />
-<style>
+<style type="text/css">
 img {
     max-width: none; /* Fix twitter bootstrap to work together with OpenLayers */
 }
@@ -40,19 +35,15 @@ img {
         margin-right: -20px;
     }
 }
-
 </style>
 {% endblock %}
 
-{% block load_js %}
+{% block js %}
 {{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}leaflet/leaflet.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}leaflet_locationfilter/locationfilter.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/worshipmap.js"></script>
-{% endblock %}
+<script type="text/javascript" src="{{ STATIC_URL }}lib/leaflet/leaflet.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lib/leaflet_locationfilter/locationfilter.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lib/kirchenreich/worshipmap.js"></script>
 
-{% block run_js %}
-{{ block.super }}
 <script type="text/javascript">
     $(document).ready(function(){
         kr.buildMap({
@@ -82,7 +73,7 @@ img {
 <li><a href="#" id="osm_count"><span class="label label-info">OpenStreetMap {{ osm_places_count|intcomma }} places</span></a></li>
 <li><a href="#" id="wikipedia_count"><span class="label label-info">Wikipedia {{ wikipedia_places_count|intcomma }} places</span></a></li>
 <li><a href="#" id="nav_status"></a></li>
-<li><a href="#" id="geolocate"><img src="{{ STATIC_URL }}icons/geolocate.png" height="20px" /></a></li>
+<li><a href="#" id="geolocate"><img src="{{ STATIC_URL }}lib/kirchenreich/icons/geolocate.png" height="20px" /></a></li>
 {% endblock %}
 
 

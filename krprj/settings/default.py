@@ -84,7 +84,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'compressor.finders.CompressorFinder'
 )
 
 # Make this unique, and don't share it with anybody.
@@ -94,7 +94,6 @@ SECRET_KEY = None
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -129,6 +128,8 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'south',
     'djcelery',
+    'compressor',
+
     'krprj.krunite',
     'krprj.osm',
     'krprj.wikipedia',
@@ -168,4 +169,3 @@ LOGGING = {
 # More celery
 BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
