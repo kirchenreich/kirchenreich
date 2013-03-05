@@ -2,4 +2,4 @@
 supervisor
 gunicorn
 raven>=3.0
-celerymon
+flower
