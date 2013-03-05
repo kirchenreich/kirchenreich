@@ -9,32 +9,17 @@
 
 {% block load_js %}
 {{ block.super }}
-<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="{{ STATIC_URL }}jquery_flot/excanvas.min.js"></script><![endif]-->
-<script type="text/javascript" src="{{ STATIC_URL }}jquery_flot/jquery.flot.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}jquery_flot/jquery.flot.pie.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}raphael/raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}raphael/g.raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}raphael/g.pie-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/dashboard.js"></script>
 <script>
-    var krunite_ratio = [{
-        label: 'OpenStreetMap',
-        data: {{ osm_count }},
-        color: '#ffc40d'
-    }, {
-        label: 'Wikipedia',
-        data: {{ wikipedia_count }},
-        color: '#049cdb'
-    }];
-    kr.plot.pie('#pie1', krunite_ratio);
+    kr.plot.pie('kirchenreich_data_source', 80, 'right', [{{ osm_count }}, {{ wikipedia_count }}], ['OSM', 'Wikipedia']);
+    kr.plot.pie('osm_ratio_plot', 80, 'left', [{{ osm_type.W }}, {{ osm_type.N }}], ['Ways', 'Nodes']);
 
-    var osm_ratio = [{
-        label: 'Ways',
-        data: {{ osm_type.W }},
-        color: '#ffc40d'
-    }, {
-        label: 'Nodes',
-        data: {{ osm_type.N }},
-        color: '#049cdb'
-    }]
-    kr.plot.pie('#osm_ratio_plot', osm_ratio);
+    {% for check in checks %}
+    kr.plot.pie_small('check_{{ check.name }}_plot', 15, [{{check.reached}}, {{check.pending}}]);
+    {% endfor %}
 </script>
 {% endblock %}
 
@@ -44,9 +29,11 @@
         <h1>Dashboard</h1>
     </div>
     <div class="row">
-        <div class="span1"></div>
-        <div class="span8" style="text-align: right">
-            <h2>Kirchenreich.org</h2>
+        <div class="span12"><h2>Database status</h2></div>
+    </div>
+    <div class="row">
+        <div class="span9" style="text-align: right">
+            <h3>Kirchenreich.org</h3>
             <div class="state-box">
                     <p id="value">{{ osm_count|intcomma }}</p>
                     <p id="help">OpenStreetMap places</p>
@@ -62,18 +49,16 @@
                     <p id="help">Places of worship</p>
             </div>
         </div>
-        <div class="span2">
-            <div id="pie1" style="height: 200px"></div>
+        <div class="span3">
+            <div id="kirchenreich_data_source"></div>
         </div>
-        <div class="span1"></div>
     </div>
     <div class="row">
-        <div class="span1"></div>
-        <div class="span2">
-            <div id="osm_ratio_plot" style="height: 200px"></div>
+        <div class="span3">
+            <div id="osm_ratio_plot"></div>
         </div>
-        <div class="span8">
-            <h2>OpenStreetMap</h2>
+        <div class="span9">
+            <h3>OpenStreetMap</h3>
             <div class="state-box">
                     <p id="value">{{ ref_need_update|intcomma }} / {{ ref_count|intcomma }}</p>
                     <p id="help">References need update</p>
@@ -87,12 +72,11 @@
                     <p id="help">Included nodes</p>
             </div>
         </div>
-        <div class="span1"></div>
     </div>
-        <div class="row">
+    <div class="row">
         <div class="span3"></div>
-        <div class="span8">
-            <h2>Wikipedia</h2>
+        <div class="span9">
+            <h3>Wikipedia</h3>
             <div class="state-box">
                     <p id="value">{{ wikipedia_count|intcomma }}</p>
                     <p id="help">Wikipedia articles</p>
@@ -102,7 +86,25 @@
                     <p id="help">Wikipedia infoboxes</p>
             </div>
         </div>
-        <div class="span1"></div>
+    </div>
+    <div class="row">
+        <div class="span12"><h2>Quality checks</h2></div>
+    </div>
+    <div class="row">
+        <div class="span3"></div>
+        <div class="span6">
+            <table class="table table-bordered">
+                <tbody>
+                    {% for check in checks %}
+                    <tr>
+                        <td>{{ check.description }}</td>
+                        <td>{{ check.percent_reached}}% ({{ check.reached|intcomma }})</td>
+                        <td><div id="check_{{ check.name }}_plot"></div></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}
