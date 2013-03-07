@@ -129,6 +129,7 @@ INSTALLED_APPS = [
     'south',
     'djcelery',
     'compressor',
+    'compressor_celery',
 
     'krprj.krunite',
     'krprj.osm',
