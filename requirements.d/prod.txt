@@ -1,5 +1,5 @@
 -r all.txt
 supervisor
 gunicorn
-raven>=3.0
+raven==3.1.17
 flower
