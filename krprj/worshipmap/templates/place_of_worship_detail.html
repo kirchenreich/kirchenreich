@@ -7,23 +7,18 @@
 <meta name="keywords" content="kirchenreich, place, of, worship, osm, openstreetmap, wikipedia, church, temple">
 {% endblock %}
 
-{% block load_css %}
+{% block css %}
 {{ block.super }}
-<link rel="stylesheet" href="{{ STATIC_URL }}leaflet/leaflet.css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}lib/leaflet/leaflet.css" />
 <!--[if lte IE 8]>
-    <link rel="stylesheet" href="{{ STATIC_URL }}leaflet/leaflet.ie.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}lib/leaflet/leaflet.ie.css" />
 <![endif]-->
-<style>
-img {
-    max-width: none; /* Fix twitter bootstrap to work together with OpenLayers */
-}
-</style>
 {% endblock %}
 
-{% block load_js %}
+{% block js %}
 {{ block.super }}
-<script src="{{ STATIC_URL }}leaflet/leaflet.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/worshipmap.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lib/leaflet/leaflet.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lib/kirchenreich/worshipmap.js"></script>
 {% endblock %}
 
 {% block run_js %}

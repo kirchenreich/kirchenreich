@@ -1,14 +1,5 @@
 {% extends "base.html" %}
 
-{% block load_css %}
-{{ block.super }}
-<style>
-img {
-    max-width: none; /* Fix twitter bootstrap to work together with OpenLayers */
-}
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="container">
     <div class="page-header">

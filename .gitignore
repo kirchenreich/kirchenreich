@@ -29,3 +29,6 @@ env_kr
 # Bad MacOSX
 .DS_Store
 ._.DS_Store
+
+# compressor
+compress/

@@ -1,2 +1,0 @@
--r all.txt
-gunicorn
