@@ -2,17 +2,17 @@
 
 {% load humanize %}
 
-{% block load_css %}
+{% block css %}
 {{ block.super }}
-<link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
+<link href="{{ STATIC_URL }}lib/kirchenreich/dashboard.css" rel="stylesheet">
 {% endblock %}
 
-{% block load_js %}
+{% block js %}
 {{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}raphael/raphael-min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}raphael/g.raphael-min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}raphael/g.pie-min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/dashboard.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lib/raphael/raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lib/raphael/g.raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lib/raphael/g.pie-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lib/kirchenreich/dashboard.js"></script>
 <script>
     kr.plot.pie('kirchenreich_data_source', 80, 'right', [{{ osm_count }}, {{ wikipedia_count }}], ['OSM', 'Wikipedia']);
     kr.plot.pie('osm_ratio_plot', 80, 'left', [{{ osm_type.W }}, {{ osm_type.N }}], ['Ways', 'Nodes']);
