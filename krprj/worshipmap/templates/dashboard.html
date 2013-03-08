@@ -13,6 +13,10 @@
 <script type="text/javascript" src="{{ STATIC_URL }}lib/raphael/g.raphael-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}lib/raphael/g.pie-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}lib/kirchenreich/dashboard.js"></script>
+{% endblock %}
+
+{% block run_js %}
+{{ block.super }}
 <script>
     kr.plot.pie('kirchenreich_data_source', 80, 'right', [{{ osm_count }}, {{ wikipedia_count }}], ['OSM', 'Wikipedia']);
     kr.plot.pie('osm_ratio_plot', 80, 'left', [{{ osm_type.W }}, {{ osm_type.N }}], ['Ways', 'Nodes']);
