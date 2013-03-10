@@ -20,22 +20,22 @@
     var krunite_ratio = [{
         label: 'OpenStreetMap',
         data: {{ osm_count }},
-        color: '#ffc40d'
+        color: kr.colors.yellow
     }, {
         label: 'Wikipedia',
         data: {{ wikipedia_count }},
-        color: '#049cdb'
+        color: kr.colors.blue
     }];
-    kr.plot.pie('#pie1', krunite_ratio);
+    kr.plot.pie('#kirchenreich_plot', krunite_ratio);
 
     var osm_ratio = [{
         label: 'Ways',
         data: {{ osm_type.W }},
-        color: '#ffc40d'
+        color: kr.colors.yellow
     }, {
         label: 'Nodes',
         data: {{ osm_type.N }},
-        color: '#049cdb'
+        color: kr.colors.blue
     }]
     kr.plot.pie('#osm_ratio_plot', osm_ratio);
 </script>
@@ -47,9 +47,13 @@
         <h1>Dashboard</h1>
     </div>
     <div class="row">
+        <div class="span12"><h2>Database status</h2>
+    </div>
+    </div>
+    <div class="row">
         <div class="span1"></div>
         <div class="span8" style="text-align: right">
-            <h2>Kirchenreich.org</h2>
+            <h3>Kirchenreich.org</h2>
             <div class="state-box">
                     <p id="value">{{ osm_count|intcomma }}</p>
                     <p id="help">OpenStreetMap places</p>
@@ -66,7 +70,7 @@
             </div>
         </div>
         <div class="span2">
-            <div id="pie1" style="height: 200px"></div>
+            <div id="kirchenreich_plot" style="height: 200px"></div>
         </div>
         <div class="span1"></div>
     </div>
@@ -76,7 +80,7 @@
             <div id="osm_ratio_plot" style="height: 200px"></div>
         </div>
         <div class="span8">
-            <h2>OpenStreetMap</h2>
+            <h3>OpenStreetMap</h2>
             <div class="state-box">
                     <p id="value">{{ ref_need_update|intcomma }} / {{ ref_count|intcomma }}</p>
                     <p id="help">References need update</p>
@@ -92,10 +96,10 @@
         </div>
         <div class="span1"></div>
     </div>
-        <div class="row">
+    <div class="row">
         <div class="span3"></div>
         <div class="span8">
-            <h2>Wikipedia</h2>
+            <h3>Wikipedia</h2>
             <div class="state-box">
                     <p id="value">{{ wikipedia_count|intcomma }}</p>
                     <p id="help">Wikipedia articles</p>
@@ -106,6 +110,27 @@
             </div>
         </div>
         <div class="span1"></div>
+    </div>
+    <div class="row">
+        <div class="span12"><h2>Quality checks</h2></div>
+    </div>
+    <div class="row">
+        <div class="span1"></div>
+        <div class="span6">
+            <table class="table table-bordered">
+                <tbody>
+                    {% for check in checks %}
+                    <tr class="kr_check" data-reached="{{ check.reached }}" data-pending="{{ check.pending }}">
+                        <td>{{ check.description }}</td>
+                        <td>{{ check.percent_reached}}% ({{ check.reached|intcomma }})</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="span2">
+            <div id="check_plot" style="height: 200px"></div>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -1,4 +1,14 @@
-var kr = {};
+if (kr === undefined) {
+    var kr = {};
+}
+
+kr.colors = {
+    yellow: '#ffc40d',
+    blue: '#049cdb',
+    red: '#9d261d',
+    green: '#46a546'
+};
+
 kr.plot = {};
 kr.plot.pie = function(target, data) {
     $.plot($(target), data, {
@@ -23,3 +33,29 @@ kr.plot.pie = function(target, data) {
         }
     });
 };
+
+kr.plot.onCheckHover = function(event, check){
+    var _data;
+    if (check === undefined) {
+        _data = $(this).data();
+    } else {
+        _data = $(check).data();
+    }
+
+    var data = [{
+        label: 'Reached',
+        data: _data.reached,
+        color: kr.colors.green
+    }, {
+        label: 'Pending',
+        data: _data.pending,
+        color: kr.colors.red
+    }];
+    kr.plot.pie('#check_plot', data);
+};
+
+$(document).ready(function() {
+    $("tr.kr_check").hover(kr.plot.onCheckHover);
+    kr.plot.onCheckHover({}, $("tr.kr_check").first());
+});
+
