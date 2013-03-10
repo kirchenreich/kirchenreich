@@ -10,7 +10,7 @@ class KircheChecks(models.Model):
     """
     """
 
-    osm = models.BooleanField("Place in OpenStreetMap",
+    osm = models.BooleanField("OpenStreetMap place",
                               default=False)
     osm_name = models.BooleanField("OpenStreetMap place is named",
                                    default=False)
@@ -21,8 +21,7 @@ class KircheChecks(models.Model):
     osm_address_complete = models.BooleanField("Full address in "
                                                "OpenStreetMap", default=False)
 
-    wikipedia = models.BooleanField("Place has Wikipedia article",
-                                    default=False)
+    wikipedia = models.BooleanField("Wikipedia article", default=False)
 
     wikipedia_infobox = models.BooleanField("Wikipedia article has infobox",
                                             default=False)
@@ -62,15 +61,13 @@ class KircheChecks(models.Model):
     def pretty(self):
         checks = []
         for check in self.available:
+            field = self._meta.get_field_by_name(check)[0]
             checks.append({
                 'name': check,
-                'description': self.get_check_description(check),
+                'description': field.verbose_name,
                 'value': getattr(self, check)
             })
         return checks
-
-    def get_check_description(self, check):
-        return self._meta.get_field_by_name(check)[0].verbose_name
 
     def _run(self):
         """Don't run this method directly!

@@ -4,7 +4,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.db.models import Count, Q
 
-from krprj.krunite.models import KircheUnite, KircheChecks
+from krprj.krunite.models import KircheUnite
 from krprj.osm.models import KircheOsm, Ref
 from krprj.wikipedia.models import KircheWikipedia
 
@@ -88,26 +88,6 @@ class DashboardView(TemplateView):
         context['wikipedia_infobox_count'] = KircheWikipedia.objects \
                                                 .filter(~Q(infobox="{}")) \
                                                 .count()
-
-        # Checks
-        context['checks'] = []
-        for check in KircheChecks().available:
-            filter = {check: 1}
-            check = {
-                'name': check,
-                'reached': KircheChecks.objects.filter(**filter).count(),
-                'description': KircheChecks().get_check_description(check)
-            }
-            check['pending'] = context['krunite_count'] - check['reached']
-            check['percent_reached'] = round(
-                float(check['reached']) / float(context['krunite_count']) \
-                * 100,
-                3
-            )
-            print check
-            context['checks'].append(check)
-
-        print context['checks']
 
         # date
         context['last_7days'] = KircheOsm.objects.filter(
