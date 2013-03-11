@@ -34,14 +34,17 @@ kr.plot.pie = function(target, data) {
     });
 };
 
-kr.plot.onCheckHover = function(event, check){
-    var _data;
+kr.plot.onCheckSelect = function(event, check){
     if (check === undefined) {
-        _data = $(this).data();
+        check = $(this);
     } else {
-        _data = $(check).data();
+        check = $(check);
     }
 
+    $("tr.kr_check").removeClass("info");
+    check.addClass("info");
+
+    var _data = check.data();
     var data = [{
         label: 'Reached',
         data: _data.reached,
@@ -55,7 +58,8 @@ kr.plot.onCheckHover = function(event, check){
 };
 
 $(document).ready(function() {
-    $("tr.kr_check").hover(kr.plot.onCheckHover);
-    kr.plot.onCheckHover({}, $("tr.kr_check").first());
+    $("tr.kr_check").hover(kr.plot.onCheckSelect);
+    $("tr.kr_check").click(kr.plot.onCheckSelect);
+    kr.plot.onCheckSelect({}, $("tr.kr_check").first());
 });
 

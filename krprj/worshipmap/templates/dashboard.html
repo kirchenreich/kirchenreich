@@ -123,7 +123,7 @@
                     <tr class="kr_check" data-reached="{{ check.reached }}" data-pending="{{ check.pending }}">
                         <td>{{ check.description }}</td>
                         <td>{{ check.reached|intcomma }}</td>
-                        <td>{{ check.percent_reached}}%</td>
+                        <td><strong>{{ check.percent_reached}}%</strong></td>
                     </tr>
                     {% endfor %}
                 </tbody>
