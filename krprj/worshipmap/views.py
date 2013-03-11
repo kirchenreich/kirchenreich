@@ -104,33 +104,6 @@ class DashboardView(TemplateView):
                 * 100,
                 3
             )
-            print check
             context['checks'].append(check)
-
-        print context['checks']
-
-        # date
-        context['last_7days'] = KircheOsm.objects.filter(
-            last_update__gt=(
-                datetime.datetime.utcnow().replace(tzinfo=utc) -
-                datetime.timedelta(days=7)
-            )
-        ).count()
-        context['older_than_1week'] = KircheOsm.objects.filter(
-            last_update__lt=(
-                datetime.datetime.utcnow().replace(tzinfo=utc) -
-                datetime.timedelta(days=7)
-            )
-        ).count()
-        context['older_than_2weeks'] = KircheOsm.objects.filter(last_update__lt=(
-                datetime.datetime.utcnow().replace(tzinfo=utc) -
-                datetime.timedelta(days=14)
-            )
-        ).count()
-        context['older_than_3weeks'] = KircheOsm.objects.filter(last_update__lt=(
-                datetime.datetime.utcnow().replace(tzinfo=utc) -
-                datetime.timedelta(days=21)
-            )
-        ).count()
 
         return context
