@@ -5,8 +5,7 @@ register = template.Library()
 
 
 def decimal_to_direction(degfloat, coordinate_type):
-    coordinate_type.lower()
-    print coordinate_type
+    coordinate_type = coordinate_type.lower()
     if coordinate_type not in ('lat', 'lon'):
         raise Exception("Coordinate type must be lat or lon")
     if degfloat > 0 and coordinate_type == 'lat':
