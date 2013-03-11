@@ -122,14 +122,15 @@
                     {% for check in checks %}
                     <tr class="kr_check" data-reached="{{ check.reached }}" data-pending="{{ check.pending }}">
                         <td>{{ check.description }}</td>
-                        <td>{{ check.percent_reached}}% ({{ check.reached|intcomma }})</td>
+                        <td>{{ check.reached|intcomma }}</td>
+                        <td>{{ check.percent_reached}}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         <div class="span2">
-            <div id="check_plot" style="height: 200px"></div>
+            <div id="check_plot" style="height: 250px; width: 400;"></div>
         </div>
     </div>
 </div>
