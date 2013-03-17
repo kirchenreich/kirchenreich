@@ -1,8 +1,10 @@
-from django.conf.urls import patterns
+from django.conf.urls import patterns, include
+from tastypie.api import Api
 
-import views
+from .resources import PlacesResource, OSMPlacesResource
 
-urlpatterns = patterns('',
-    (r'^v1/$', views.api_status),
-    (r'^v1/places/$', views.PlacesResource.as_view()),
-)
+v1_api = Api(api_name='v1')
+v1_api.register(PlacesResource())
+v1_api.register(OSMPlacesResource())
+
+urlpatterns = patterns('', (r'^', include(v1_api.urls)))

@@ -77,16 +77,16 @@ kr.refresh_markers = function(bounds){
     $("#nav_status").html('<span class="label label-warning">Loading...</span>');
     kr.request_id++;
 
-    var url = "/api/v1/places/?epsg=4326&in_bbox=" + bounds.toBBoxString() + "&request_id=" + kr.request_id;
+    var url = "/api/v1/places/?without_relations&limit=300&in_bbox=" + bounds.toBBoxString() + "&request_id=" + kr.request_id;
     if (kr.on_mobile()){
         url = url + "&limit=100";
     }
     xhr = $.getJSON(url, function(response, status, xhr){
         $("#zoom_in_alert").hide();
-        if (response.request_id == kr.request_id) {
+        if (response.meta.request_id == kr.request_id) {
             kr.markers.clearLayers();
-            for (var i in response.places_of_worship) {
-                place = response.places_of_worship[i];
+            for (var i in response.objects) {
+                place = response.objects[i];
 
                 var icon;
                 if (place.religion in kr.marker_icons) {
@@ -95,7 +95,7 @@ kr.refresh_markers = function(bounds){
                     icon = kr.marker_icons['default'];
                 }
 
-                var marker = new L.marker([place.lat, place.lon], {icon: icon});
+                var marker = new L.marker([place.point.coordinates[1], place.point.coordinates[0]], {icon: icon});
                 marker.place_id = place.id;
                 marker.place_name = place.name;
                 marker.place_religion = place.religion;
@@ -105,7 +105,8 @@ kr.refresh_markers = function(bounds){
                 marker.on("mouseover", kr.on_marker_mousehover);
                 marker.addTo(kr.markers);
             }
-            $("#nav_status").html('<span class="label label-success">'+ response.places_of_worship_count + ' places</span>');
+            $("#nav_status").html('<span class="label label-success">'+ response.objects.length + ' places</span>');
+            /*
             if (response.statistics.religion !== undefined) {
                 var religions = [];
                 for (var religion in response.statistics.religion) {
@@ -141,9 +142,10 @@ kr.refresh_markers = function(bounds){
                     });
                 }
             }
+            */
         }
     }).error(function(){
-        if (xhr.status == 422) {
+        if (xhr.status === 400) {
             $("#nav_status").html('<span class="label label-important"><strong>Please zoom in.</strong> There are to many places to display.</span>');
             kr.markers.clearLayers();
             if (kr.statistics.is_visible()){
