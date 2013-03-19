@@ -1,17 +1,15 @@
 from django.contrib.gis.geos import Point, Polygon
 
 from tastypie import fields
-from tastypie.resources import ModelResource
 from tastypie.contrib.gis.resources import ModelResource as GeoModelResource
 from tastypie.exceptions import InvalidFilterError, BadRequest
 
 from krprj.krunite.models import KircheUnite
 from krprj.osm.models import KircheOsm
 
-from time import time
-from django.db import connection
 
 class OSMPlacesResource(GeoModelResource):
+
     class Meta:
         queryset = KircheOsm.objects.all()
         resource_name = 'osm_places'
@@ -30,7 +28,7 @@ class PlacesResource(GeoModelResource):
         filtering = {
             "name": ('exact', 'startswith', 'contains')
         }
-        max_limit = 100
+        max_limit = 50
 
     def build_filters(self, filters=None):
         if filters is None:
@@ -71,9 +69,6 @@ class PlacesResource(GeoModelResource):
         return super(PlacesResource, self).get_list(request, **kwargs)
 
     def alter_list_data_to_serialize(self, request, data):
-        for x in connection.queries:
-            print x
-            print
         if 'request_id' in request.GET:
             data['meta']['request_id'] = request.GET['request_id']
         return data
