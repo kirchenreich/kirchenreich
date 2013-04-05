@@ -77,7 +77,7 @@ kr.refresh_markers = function(bounds){
     $("#nav_status").html('<span class="label label-warning">Loading...</span>');
     kr.request_id++;
 
-    var url = "/api/v1/places/?without_relations&limit=300&in_bbox=" + bounds.toBBoxString() + "&request_id=" + kr.request_id;
+    var url = "/api/v1/places/?limit=500&in_bbox=" + bounds.toBBoxString() + "&request_id=" + kr.request_id;
     if (kr.on_mobile()){
         url = url + "&limit=100";
     }

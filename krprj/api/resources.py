@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.gis.geos import Point, Polygon
 
 from tastypie import fields
@@ -6,19 +8,49 @@ from tastypie.exceptions import InvalidFilterError, BadRequest
 
 from krprj.krunite.models import KircheUnite
 from krprj.osm.models import KircheOsm
+from krprj.wikipedia.models import KircheWikipedia
 
 
 class OSMPlacesResource(GeoModelResource):
 
     class Meta:
         queryset = KircheOsm.objects.all()
+        allowed_methods = ['get']
         resource_name = 'osm_places'
-        max_limit = 500
+        max_limit = 50
+
+    place = fields.ToOneField('krprj.api.resources.PlacesResource', 'unite',
+                              null=True)
+
+    def dehydrate_addional_fields(self, bundle):
+        return json.loads(bundle.data.get('addional_fields', '{}'))
+
+
+class WikipediaArticleResource(GeoModelResource):
+
+    class Meta:
+        queryset = KircheWikipedia.objects.all()
+        allowed_methods = ['get']
+        resource_name = 'wikipedia_articles'
+        max_limit = 50
+
+    contents = fields.CharField(attribute='contents', null=True,
+                                use_in='detail')
+
+    place = fields.ToOneField('krprj.api.resources.PlacesResource', 'unite',
+                              null=True)
+
+    def dehydrate_infobox(self, bundle):
+        return json.loads(bundle.data['infobox'])
 
 
 class PlacesResource(GeoModelResource):
 
-    osm_places = fields.ToManyField(OSMPlacesResource, 'kircheosm_set', full=True)
+    osm_places = fields.ToManyField(OSMPlacesResource, 'kircheosm_set',
+                                    full=False, use_in='detail')
+    wikipedia_articles = fields.ToManyField(WikipediaArticleResource,
+                                            'kirchewikipedia_set',
+                                            full=False, use_in='detail')
 
     class Meta:
         queryset = KircheUnite.objects.all()
@@ -28,7 +60,7 @@ class PlacesResource(GeoModelResource):
         filtering = {
             "name": ('exact', 'startswith', 'contains')
         }
-        max_limit = 50
+        max_limit = 500
 
     def build_filters(self, filters=None):
         if filters is None:
@@ -61,12 +93,6 @@ class PlacesResource(GeoModelResource):
             orm_filters['point__contained'] = bbox
 
         return orm_filters
-
-    def get_list(self, request, **kwargs):
-        if 'without_relations' in request.GET:
-            self.fields.pop("osm_places", None)
-            self._meta.max_limit = 500
-        return super(PlacesResource, self).get_list(request, **kwargs)
 
     def alter_list_data_to_serialize(self, request, data):
         if 'request_id' in request.GET:
