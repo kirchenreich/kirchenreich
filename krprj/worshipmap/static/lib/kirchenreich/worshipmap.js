@@ -144,7 +144,7 @@ kr.refresh_markers = function(bounds){
         }
     }).error(function(){
         if (xhr.status == 422) {
-            $("#nav_status").html('<span class="label label-important"><strong>Please zoom in.</strong> There are to many places to display.</span>');
+            $("#nav_status").html('<span class="label label-important"><strong>Please zoom in.</strong></span>');
             kr.markers.clearLayers();
             if (kr.statistics.is_visible()){
                 kr.statistics.hide(function(){
