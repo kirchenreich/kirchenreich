@@ -6,6 +6,7 @@ django-celery-with-redis
 django_compressor
 -e git+https://github.com/jarus/django_compressor_celery.git#egg=django_compressor_celery
 django-redis-cache
+django-secure
 slimit
 cssmin
 imposm.parser

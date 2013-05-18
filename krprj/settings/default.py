@@ -99,6 +99,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'djangosecure.middleware.SecurityMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -131,6 +132,7 @@ INSTALLED_APPS = [
     'djcelery',
     'compressor',
     'compressor_celery',
+    'djangosecure',
 
     'krprj.krunite',
     'krprj.osm',
@@ -174,3 +176,11 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 # Setting X-Frame-Options for all responses
 X_FRAME_OPTIONS = 'DENY'
+
+# django-secure
+SESSION_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 1
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_FRAME_DENY = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
