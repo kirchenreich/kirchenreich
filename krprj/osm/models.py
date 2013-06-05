@@ -8,7 +8,7 @@ from datetime import datetime
 from django.utils.timezone import utc
 
 class KircheOsm(models.Model):
-    osm_id = models.IntegerField(db_index=True)
+    osm_id = models.BigIntegerField(db_index=True)
     TYPE_CHOICES = (
             ('N','node'),
             ('W','way'),
@@ -91,7 +91,7 @@ class KircheOsm(models.Model):
 class Ref(models.Model):
     """ table for caching references needed for ways
     """
-    osm_id = models.IntegerField(db_index=True)
+    osm_id = models.BigIntegerField(db_index=True)
     point = models.PointField(blank=True, null=True)
 
     need_update = models.BooleanField(default=True)
