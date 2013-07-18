@@ -185,4 +185,4 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
 
-ALLOWED_HOSTS = ('.kirchenreich.org', '141.58.160.16', )
+ALLOWED_HOSTS = ('.kirchenreich.org', '141.58.160.16', '/fs/web/kirchenreich/var/run/gunicorn.sock:80', '127.0.0.1')
