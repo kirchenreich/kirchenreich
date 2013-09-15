@@ -1,4 +1,4 @@
-Django==1.4.6
+Django==1.4.8
 psycopg2
 South==0.7.6
 django-celery==3.0.11
