@@ -208,18 +208,7 @@ kr.buildMap = function(options){
         }
     }
 
-    var osm_layer = new L.TileLayer(
-        'http://{s}.tile.cloudmade.com/3872B775BBB74188AAFBF300F25489EB/997/256/{z}/{x}/{y}.png',
-        {
-            minZoom: 3,
-            maxZoom: 18,
-            attribution: 'Map data © OpenStreetMap contributors, Imagery © CloudMade'
-        }
-    );
-    kr.map = L.map(options.target, {
-        csr: L.CRS.EPSG4326
-    });
-    kr.map.addLayer(osm_layer);
+    kr.map = L.mapbox.map(options.target, 'kirchenreich.icjh0ggp');
     kr.map.setView(options.center, options.zoom);
 
     // Base marker layer
