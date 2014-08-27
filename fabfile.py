@@ -1,3 +1,8 @@
+#
+# Deployment for kirchenreich.org private server
+# This is only an example for other installations
+#
+
 import os
 import time
 
