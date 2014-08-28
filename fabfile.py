@@ -1,33 +1,36 @@
+#
+# Deployment for kirchenreich.org private server
+# This is only an example for other installations
+#
+
 import os
 import time
 
-from fabric.api import task, env, sudo, cd, prefix
+from fabric.api import task, env, sudo, cd, prefix, run
 from fabric.utils import puts
 from fabric.colors import yellow, green
 
-env.hosts = ["turmfalke.ims.uni-stuttgart.de"]
-env.app_user = "kirchenreich"
+env.hosts = ["spatz.madflex.de"]
 
-env.remote_workdir = '/fs/web/%s/' % env.app_user
-env.virtualenv_dir = env.remote_workdir
+env.remote_workdir = '/home/%s/virtualenvs/kirchenreich' % env.user
+env.virtualenv_dir = env.remote_workdir + '/kr_env'
 
 
 def in_rwd(path):
     """Complete relative path to full path on remote system"""
     return os.path.join(env.remote_workdir, path)
 
-env.source_dir = in_rwd('src/')
-env.requirements_file = in_rwd('src/requirements.d/prod.txt')
-env.gunicorn_pidpath = in_rwd('var/run/gunicorn.pid')
+env.source_dir = in_rwd('kirchenreich/')
+env.requirements_file = in_rwd('kirchenreich/requirements.d/prod.txt')
 
 
 def django_manage(*args):
     """Use the remote django manage.py"""
 
     with cd(env.source_dir):
-        with prefix('source %s' % in_rwd('bin/activate')):
+        with prefix('source %s' % os.path.join(env.virtualenv_dir, 'bin/activate')):
             args_string = ' '.join(args + ('--settings=krprj.settings.prod',))
-            sudo('python manage.py ' + args_string, user=env.app_user)
+            run('python manage.py ' + args_string)
 
 
 @task
@@ -36,8 +39,8 @@ def git_pull():
 
     puts(yellow("Pull master from GitHub"))
     with cd(env.source_dir):
-        sudo('git reset --hard HEAD', user=env.app_user)
-        sudo('git pull', user=env.app_user)
+        run('git reset --hard HEAD')
+        run('git pull')
 
 
 @task
@@ -88,9 +91,9 @@ def restart_celery():
 def deploy():
     """Get source and update virtualenv, statics and run South migrations"""
     git_pull()
-    build_virtualenv()
-    collectstatic()
+#    build_virtualenv()
+#    collectstatic()
     migrate()
-    reload_gunicorn()
-    restart_celery()
+#    reload_gunicorn()
+#    restart_celery()
     puts(green("Deployment done!"))
