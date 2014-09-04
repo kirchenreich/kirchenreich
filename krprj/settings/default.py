@@ -131,7 +131,7 @@ INSTALLED_APPS = [
     'djcelery',
     'compressor',
     'compressor_celery',
-    'djangosecure',
+#    'djangosecure',
 
     'krprj.krunite',
     'krprj.osm',
@@ -178,12 +178,12 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 X_FRAME_OPTIONS = 'DENY'
 
 # django-secure
-SESSION_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 1
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_FRAME_DENY = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
+#SESSION_COOKIE_SECURE = True
+#SECURE_HSTS_SECONDS = 1
+#SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#SECURE_FRAME_DENY = True
+#SECURE_CONTENT_TYPE_NOSNIFF = True
+#SECURE_BROWSER_XSS_FILTER = True
+#SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
 
 ALLOWED_HOSTS = ('.kirchenreich.org', '141.58.160.16', '/fs/web/kirchenreich/var/run/gunicorn.sock:80', '127.0.0.1')
