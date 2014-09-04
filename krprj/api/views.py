@@ -10,13 +10,17 @@ from django.db.models import Count
 
 from krprj.osm.models import KircheOsm
 from krprj.krunite.models import KircheUnite
+from django.conf import settings
 
-@login_required()
+
 def api_status(request):
-    x = ''
+    # example call:
+    # curl http://kirchenreich.org/api/v1/ -H "APIKEY: <KEY>"
     if request.META.get('HTTP_APIKEY'):
-        x = 'using APIKEY(%s)' % request.META.get('HTTP_APIKEY')
-    return HttpResponse("Success: %s\n" % x)
+        APIKEY = getattr(settings, 'APIKEY', None)
+        if APIKEY == request.META.get('HTTP_APIKEY'):
+            return HttpResponse("authenticated")
+    return HttpResponse("...")
 
 
 def JSONResponse(**kwargs):

@@ -138,6 +138,7 @@ INSTALLED_APPS = [
     'krprj.wikipedia',
     'krprj.world',
     'krprj.worshipmap',
+    'krprj.api',
 ]
 
 # A sample logging configuration. The only tangible logging
